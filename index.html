@@ -89,19 +89,8 @@ headers:{
 },
 body:JSON.stringify(dados)
 })
-.then(r => r.json())
-.then(r => {
-  if(r.ok){
-    document.getElementById("status").innerText = "✔ Cadastro realizado com sucesso!";
-  } else {
-    document.getElementById("status").innerText = "❌ Erro: " + r.error;
-  }
-})
-.catch(e=>{
-  document.getElementById("status").innerText = "Erro conexão: " + e;
-});
 .then(()=>{
-document.getElementById("status").innerText="✔ Cadastro enviado! Confira Drive e planilha.";
+document.getElementById("status").innerText="✔ Cadastro enviado! Aguarde alguns segundos e confira a planilha e o Drive.";
 });
 
 }
