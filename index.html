@@ -83,7 +83,10 @@ document.getElementById("status").innerText="Enviando...";
 
 fetch(URL,{
 method:"POST",
-headers:{"Content-Type":"application/json"},
+mode:"no-cors",
+headers:{
+"Content-Type":"text/plain"
+},
 body:JSON.stringify(dados)
 })
 .then(r => r.json())
