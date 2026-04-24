@@ -4,97 +4,345 @@
 <meta charset="UTF-8">
 <title>Sistema LP</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body{font-family:Arial;margin:0;background:#f4f4f4}
+body{font-family:Arial;margin:0;background:#f4f4f4;color:#111}
 header{background:#111;color:#fff;padding:15px}
-main{padding:15px;max-width:600px;margin:auto}
-.card{background:#fff;padding:15px;border-radius:10px;margin-bottom:15px}
+main{padding:15px;max-width:800px;margin:auto}
+.card{background:#fff;padding:15px;border-radius:12px;margin-bottom:15px}
 button{width:100%;padding:12px;margin-top:10px;border:0;border-radius:8px;font-weight:bold;background:#111;color:#fff}
-input,select{width:100%;padding:10px;margin-top:5px;margin-bottom:10px;border:1px solid #ccc;border-radius:8px}
+button.sec{background:#444}
+button.green{background:#166534}
+input,select,textarea{width:100%;padding:10px;margin-top:5px;margin-bottom:10px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
+label{font-weight:bold}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#f8f8f8;border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:10px}
+.hidden{display:none}
+@media(max-width:700px){.row{grid-template-columns:1fr}}
 </style>
 </head>
 
 <body>
-
 <header>
-<h2>Sistema LP</h2>
+<h2>Sistema LP - Previdenciário</h2>
+<label>Usuário</label>
+<select id="responsavel">
+<option value="BRUNO">1 - BRUNO</option>
+<option value="PATRICIA">2 - PATRICIA</option>
+<option value="LORRAYNE">3 - LORRAYNE</option>
+</select>
 </header>
 
 <main>
 
 <div class="card">
-<h3>Cadastro rápido</h3>
+<h3>CADASTRAR NOVO CLIENTE</h3>
 
-<label>Nome</label>
-<input id="nome">
+<label>Nome completo *</label>
+<input id="clienteNome">
 
-<label>CPF</label>
-<input id="cpf">
+<div class="row">
+<div>
+<label>CPF *</label>
+<input id="clienteCpf" maxlength="14" oninput="mascaraCPF(this)">
+<div id="cpfMsg"></div>
+</div>
+<div>
+<label>Data de nascimento *</label>
+<input id="clienteDataNascimentoISO" type="date">
+</div>
+</div>
 
-<label>Data nascimento</label>
-<input id="nascimento" type="date">
-
+<div class="row">
+<div>
 <label>WhatsApp</label>
 <input id="whatsapp">
+</div>
+<div>
+<label>Nacionalidade</label>
+<input id="clienteNacionalidade" value="BRASILEIRA">
+</div>
+</div>
 
-<label>Benefício</label>
-<select id="beneficio">
-<option>BENEFÍCIO POR INCAPACIDADE</option>
-<option>AUXÍLIO-ACIDENTE</option>
-<option>BPC</option>
-<option>SALÁRIO-MATERNIDADE</option>
-<option>APOSENTADORIA</option>
+<label>Estado civil</label>
+<select id="clienteEstadoCivil">
+<option value="">Selecione...</option>
+<option>SOLTEIRO(A)</option>
+<option>CASADO(A)</option>
+<option>DIVORCIADO(A)</option>
+<option>VIÚVO(A)</option>
+<option>UNIÃO ESTÁVEL</option>
 </select>
 
-<button onclick="enviar()">CADASTRAR + GERAR PDF</button>
+<label>Endereço</label>
+<textarea id="clienteEndereco" rows="2"></textarea>
 
+<label>UF</label>
+<select id="clienteUF">
+<option>MT</option><option>GO</option><option>RO</option><option>SP</option><option>RJ</option>
+<option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+<option>CE</option><option>DF</option><option>ES</option><option>MA</option><option>MS</option>
+<option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option>
+<option>PI</option><option>RN</option><option>RS</option><option>RR</option><option>SC</option>
+<option>SE</option><option>TO</option>
+</select>
+</div>
+
+<div class="card">
+<h3>Benefícios e honorários</h3>
+<div id="beneficiosArea"></div>
+<button class="sec" onclick="addBeneficio()">+ ADICIONAR MAIS BENEFÍCIO</button>
+</div>
+
+<div class="card">
+<h3>Forma de assinatura</h3>
+
+<label>Forma de assinatura</label>
+<select id="formaAssinatura" onchange="toggleRogo()">
+<option value="MANUAL">MANUAL / IMPRESSA</option>
+<option value="D4SIGN">D4SIGN - ENVIO MANUAL</option>
+</select>
+
+<div id="rogoBox">
+<label>Assinatura a rogo?</label>
+<select id="assinaturaARogo">
+<option>NÃO</option>
+<option>SIM</option>
+</select>
+</div>
+</div>
+
+<div class="card">
+<button class="sec" onclick="toggleComplementar()">COMPLEMENTAR CADASTRO DO CLIENTE</button>
+
+<div id="complementar" class="hidden box">
+<label>Acesso GOV</label>
+<input id="govAcesso">
+
+<div class="row">
+<div>
+<label>Está trabalhando?</label>
+<select id="estaTrabalhando"><option></option><option>SIM</option><option>NÃO</option></select>
+</div>
+<div>
+<label>Qualidade de segurado?</label>
+<select id="qualidadeSegurado"><option></option><option>SIM</option><option>NÃO</option><option>NÃO SEI / A APURAR</option></select>
+</div>
+</div>
+
+<label>Especialidade médica / doença</label>
+<select id="especialidadeMedica">
+<option></option><option>NEUROLÓGICA</option><option>PSIQUIÁTRICA</option><option>ORTOPÉDICA</option>
+<option>CÂNCER</option><option>DOENÇA DEGENERATIVA</option><option>VISUAL</option><option>AUTOIMUNE</option><option>OUTRA</option>
+</select>
+
+<label>Observação da doença</label>
+<textarea id="doencaObservacao" rows="2"></textarea>
+
+<div class="row">
+<div>
+<label>Possui laudo?</label>
+<select id="possuiLaudo"><option></option><option>SIM</option><option>NÃO</option></select>
+</div>
+<div>
+<label>Tempo do laudo</label>
+<select id="tempoLaudo">
+<option></option><option>PERMANENTE</option><option>10 DIAS</option><option>20 DIAS</option><option>30 DIAS</option>
+<option>60 DIAS</option><option>90 DIAS</option><option>120 DIAS</option><option>180 DIAS</option><option>OUTRO</option>
+</select>
+</div>
+</div>
+
+<label>Origem do cliente</label>
+<select id="origemCliente">
+<option></option><option>INDICAÇÃO</option><option>CLIENTE ANTIGO</option><option>GOOGLE</option>
+<option>INSTAGRAM</option><option>FACEBOOK</option><option>TRÁFEGO PAGO</option><option>OUTRO</option>
+</select>
+</div>
+</div>
+
+<div class="card">
+<h3>Ação final</h3>
+<button class="sec" onclick="enviar('cadastro_only')">SOMENTE CADASTRAR CLIENTE</button>
+<button class="green" onclick="enviar('cadastro_pdf')">CADASTRO E PDF</button>
 <div id="status"></div>
 </div>
 
 </main>
 
 <script>
-
 const URL = "https://script.google.com/macros/s/AKfycbx5GYE_QlsQ7E7z_L8HDsUymFFRtOad8WAWYfQDAW9nS8tNqIF4liF0tpA79U-Uek26dQ/exec";
+const TOKEN = "BRUNO-SEGURANCA-2026";
+let benefCount = 0;
 
-function enviar(){
+function $(id){return document.getElementById(id)}
+function digits(v){return String(v||"").replace(/\D/g,"")}
+function toggleComplementar(){ $("complementar").classList.toggle("hidden") }
 
-const dados = {
-action:"cadastro_pdf",
-token:"BRUNO-SEGURANCA-2026",
+function mascaraCPF(el){
+let v=digits(el.value).slice(0,11);
+v=v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+el.value=v;
+if(el.id==="clienteCpf"){
+$("cpfMsg").innerText = digits(v).length===11 ? (validarCPF(v) ? "CPF válido" : "CPF inválido") : "";
+$("cpfMsg").style.color = validarCPF(v) ? "green" : "red";
+}
+}
 
-clienteNome:document.getElementById("nome").value,
-clienteCpf:document.getElementById("cpf").value.replace(/\D/g,""),
-clienteDataNascimentoISO:document.getElementById("nascimento").value,
-whatsapp:document.getElementById("whatsapp").value.replace(/\D/g,""),
+function validarCPF(cpf){
+cpf=digits(cpf);
+if(cpf.length!==11 || /^(\d)\1+$/.test(cpf)) return false;
+let soma=0, resto;
+for(let i=0;i<9;i++) soma+=parseInt(cpf[i])*(10-i);
+resto=(soma*10)%11; if(resto===10) resto=0;
+if(resto!==parseInt(cpf[9])) return false;
+soma=0;
+for(let i=0;i<10;i++) soma+=parseInt(cpf[i])*(11-i);
+resto=(soma*10)%11; if(resto===10) resto=0;
+return resto===parseInt(cpf[10]);
+}
 
-beneficio:document.getElementById("beneficio").value,
+function addBeneficio(valor="BENEFÍCIO POR INCAPACIDADE"){
+if(benefCount>=4){alert("Limite de 4 benefícios.");return;}
+const i=benefCount++;
+const div=document.createElement("div");
+div.className="box";
+div.id="benef_"+i;
+div.innerHTML=`
+<label>Benefício ${i+1}</label>
+<select id="beneficio_${i}" onchange="renderHon(${i})">
+<option>BENEFÍCIO POR INCAPACIDADE</option>
+<option>AUXÍLIO-ACIDENTE</option>
+<option>BPC</option>
+<option>SALÁRIO-MATERNIDADE</option>
+<option>APOSENTADORIA</option>
+<option>PENSÃO POR MORTE</option>
+</select>
+<div id="hon_${i}"></div>
+`;
+$("beneficiosArea").appendChild(div);
+$("beneficio_"+i).value=valor;
+renderHon(i);
+}
 
-formaAssinatura:"MANUAL",
-assinaturaARogo:"NÃO",
-responsavel:"BRUNO",
+function renderHon(i){
+const b=$("beneficio_"+i).value;
+const box=$("hon_"+i);
 
+if(b.includes("INCAPACIDADE")){
+box.innerHTML=`
+<div class="row">
+<div><label>% inicial</label><input id="percInicial_${i}" value="30" type="number"></div>
+<div><label>Nº parcelas iniciais</label><input id="numParcelasIniciais_${i}" value="8" type="number"></div>
+</div>
+<label>% após as 8 primeiras parcelas</label>
+<input id="percAposIniciais_${i}" value="15" type="number">
+`;
+} else if(b.includes("MATERNIDADE")){
+box.innerHTML=`
+<div class="row">
+<div><label>% maternidade</label><input id="percMaternidade_${i}" value="30" type="number"></div>
+<div><label>Nº parcelas</label><input id="numParcelasMaternidade_${i}" value="4" type="number"></div>
+</div>`;
+} else {
+box.innerHTML=`
+<div class="row">
+<div><label>% retroativo</label><input id="percRetroativo_${i}" value="45" type="number"></div>
+<div><label>Nº parcelas integrais</label><input id="numPrimeirasParcelasIntegrais_${i}" value="6" type="number"></div>
+</div>`;
+}
+}
+
+function honorarios(){
+const itens=[];
+document.querySelectorAll("[id^='benef_']").forEach(card=>{
+const i=card.id.split("_")[1];
+const b=$("beneficio_"+i)?.value;
+if(!b) return;
+const item={beneficio:b};
+
+if(b.includes("INCAPACIDADE")){
+item.percInicial=+$("percInicial_"+i).value;
+item.numParcelasIniciais=+$("numParcelasIniciais_"+i).value;
+item.percAposIniciais=+$("percAposIniciais_"+i).value;
+} else if(b.includes("MATERNIDADE")){
+item.percMaternidade=+$("percMaternidade_"+i).value;
+item.numParcelasMaternidade=+$("numParcelasMaternidade_"+i).value;
+} else {
+item.percRetroativo=+$("percRetroativo_"+i).value;
+item.numPrimeirasParcelasIntegrais=+$("numPrimeirasParcelasIntegrais_"+i).value;
+}
+itens.push(item);
+});
+return itens;
+}
+
+function toggleRogo(){
+$("rogoBox").style.display = $("formaAssinatura").value==="D4SIGN" ? "none" : "block";
+if($("formaAssinatura").value==="D4SIGN") $("assinaturaARogo").value="NÃO";
+}
+
+function montarDados(action){
+return {
+action:action,
+token:TOKEN,
+clienteNome:$("clienteNome").value,
+clienteCpf:digits($("clienteCpf").value),
+clienteDataNascimentoISO:$("clienteDataNascimentoISO").value,
+whatsapp:digits($("whatsapp").value),
+clienteNacionalidade:$("clienteNacionalidade").value,
+clienteEstadoCivil:$("clienteEstadoCivil").value,
+clienteEndereco:$("clienteEndereco").value,
+clienteUF:$("clienteUF").value,
+govAcesso:$("govAcesso").value,
+honorariosItens:honorarios(),
+formaAssinatura:$("formaAssinatura").value,
+assinaturaARogo:$("assinaturaARogo").value,
+especialidadeMedica:$("especialidadeMedica").value,
+doencaObservacao:$("doencaObservacao").value,
+possuiLaudo:$("possuiLaudo").value,
+tempoLaudo:$("tempoLaudo").value,
+qualidadeSegurado:$("qualidadeSegurado").value,
+estaTrabalhando:$("estaTrabalhando").value,
+origemCliente:$("origemCliente").value,
+responsavel:$("responsavel").value,
 local:"Várzea Grande/MT",
-data:new Date().toLocaleDateString()
+data:new Date().toLocaleDateString("pt-BR")
 };
+}
 
-document.getElementById("status").innerText="Enviando...";
+function enviar(action){
+const cpf=digits($("clienteCpf").value);
+if(!$("clienteNome").value || !cpf || !$("clienteDataNascimentoISO").value){
+alert("Preencha nome, CPF e data de nascimento.");
+return;
+}
+if(!validarCPF(cpf)){
+alert("CPF inválido.");
+return;
+}
+
+let msg=`CONFIRA OS DADOS:\n\nNome: ${$("clienteNome").value}\nCPF: ${$("clienteCpf").value}\nNascimento: ${$("clienteDataNascimentoISO").value}\n\nConfirmar?`;
+if(!confirm(msg)) return;
+
+if(action==="cadastro_only" && !confirm("Contrato e procuração NÃO serão gerados. Confirmar somente cadastro?")) return;
+
+$("status").innerText="Enviando... aguarde alguns segundos.";
 
 fetch(URL,{
 method:"POST",
 mode:"no-cors",
-headers:{
-"Content-Type":"text/plain"
-},
-body:JSON.stringify(dados)
+headers:{"Content-Type":"text/plain"},
+body:JSON.stringify(montarDados(action))
 })
 .then(()=>{
-document.getElementById("status").innerText="✔ Cadastro enviado! Aguarde alguns segundos e confira a planilha e o Drive.";
+$("status").innerText="✔ Enviado. Confira a planilha e o Drive.";
 });
-
 }
 
+document.addEventListener("DOMContentLoaded",()=>{
+addBeneficio();
+toggleRogo();
+});
 </script>
 
 </body>
