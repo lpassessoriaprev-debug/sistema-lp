@@ -7,17 +7,23 @@
 <style>
 body{font-family:Arial;margin:0;background:#f4f4f4;color:#111}
 header{background:#111;color:#fff;padding:15px}
-main{padding:15px;max-width:800px;margin:auto}
-.card{background:#fff;padding:15px;border-radius:12px;margin-bottom:15px}
-button{width:100%;padding:12px;margin-top:10px;border:0;border-radius:8px;font-weight:bold;background:#111;color:#fff}
+main{padding:15px;max-width:950px;margin:auto}
+.card{background:#fff;padding:15px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
+button{width:100%;padding:12px;margin-top:10px;border:0;border-radius:8px;font-weight:bold;background:#111;color:#fff;cursor:pointer}
 button.sec{background:#444}
 button.green{background:#166534}
+button.red{background:#991b1b}
 input,select,textarea{width:100%;padding:10px;margin-top:5px;margin-bottom:10px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
 label{font-weight:bold}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .box{background:#f8f8f8;border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:10px}
 .hidden{display:none}
-@media(max-width:700px){.row{grid-template-columns:1fr}}
+.item{border-bottom:1px solid #ddd;padding:8px 0}
+.week{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.day{background:#fff;border:1px solid #ddd;border-radius:10px;padding:8px;min-height:100px}
+.small{font-size:13px;color:#555}
+@media(max-width:800px){.row,.row3,.week{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -35,6 +41,13 @@ label{font-weight:bold}
 <main>
 
 <div class="card">
+<button onclick="show('cadastro')">CADASTRAR NOVO CLIENTE</button>
+<button class="sec" onclick="show('busca')">BUSCAR CLIENTES</button>
+<button class="sec" onclick="show('agenda')">AGENDAMENTOS</button>
+<button class="sec" onclick="show('financeiro')">FINANCEIRO</button>
+</div>
+
+<section id="cadastro" class="card">
 <h3>CADASTRAR NOVO CLIENTE</h3>
 
 <label>Nome completo *</label>
@@ -44,7 +57,7 @@ label{font-weight:bold}
 <div>
 <label>CPF *</label>
 <input id="clienteCpf" maxlength="14" oninput="mascaraCPF(this)">
-<div id="cpfMsg"></div>
+<div id="cpfMsg" class="small"></div>
 </div>
 <div>
 <label>Data de nascimento *</label>
@@ -85,17 +98,14 @@ label{font-weight:bold}
 <option>PI</option><option>RN</option><option>RS</option><option>RR</option><option>SC</option>
 <option>SE</option><option>TO</option>
 </select>
-</div>
 
-<div class="card">
+<div class="box">
 <h3>Benefícios e honorários</h3>
 <div id="beneficiosArea"></div>
 <button class="sec" onclick="addBeneficio()">+ ADICIONAR MAIS BENEFÍCIO</button>
 </div>
 
-<div class="card">
-<h3>Forma de assinatura</h3>
-
+<div class="box">
 <label>Forma de assinatura</label>
 <select id="formaAssinatura" onchange="toggleRogo()">
 <option value="MANUAL">MANUAL / IMPRESSA</option>
@@ -111,8 +121,7 @@ label{font-weight:bold}
 </div>
 </div>
 
-<div class="card">
-<button class="sec" onclick="toggleComplementar()">COMPLEMENTAR CADASTRO DO CLIENTE</button>
+<button class="sec" onclick="toggle('complementar')">COMPLEMENTAR CADASTRO DO CLIENTE</button>
 
 <div id="complementar" class="hidden box">
 <label>Acesso GOV</label>
@@ -158,14 +167,160 @@ label{font-weight:bold}
 <option>INSTAGRAM</option><option>FACEBOOK</option><option>TRÁFEGO PAGO</option><option>OUTRO</option>
 </select>
 </div>
+
+<div class="box">
+<button class="sec" onclick="enviarCadastro('cadastro_only')">SOMENTE CADASTRAR CLIENTE</button>
+<button class="green" onclick="enviarCadastro('cadastro_pdf')">CADASTRO E PDF</button>
+<button class="sec" onclick="enviarCadastro('cadastro_pdf')">REGERAR DOCUMENTOS</button>
+<div id="statusCadastro" class="small"></div>
+</div>
+</section>
+
+<section id="busca" class="card hidden">
+<h3>BUSCAR CLIENTES</h3>
+
+<div class="row">
+<div>
+<label>Buscar por CPF</label>
+<input id="buscaCpf" oninput="mascaraCPF(this)">
+<button onclick="buscarCpf()">BUSCAR CPF</button>
+</div>
+<div>
+<label>Buscar por nome</label>
+<input id="buscaNome">
+<button onclick="buscarNome()">BUSCAR NOME</button>
+</div>
 </div>
 
-<div class="card">
-<h3>Ação final</h3>
-<button class="sec" onclick="enviar('cadastro_only')">SOMENTE CADASTRAR CLIENTE</button>
-<button class="green" onclick="enviar('cadastro_pdf')">CADASTRO E PDF</button>
-<div id="status"></div>
+<div id="resultadoBusca" class="box"></div>
+
+<div class="box">
+<button class="sec" onclick="listarClientes('alfabetica')">LISTA EM ORDEM ALFABÉTICA</button>
+<button class="sec" onclick="listarClientes('cadastro')">LISTA POR ORDEM DE CADASTRO</button>
+<div id="listaClientes"></div>
 </div>
+</section>
+
+<section id="agenda" class="card hidden">
+<h3>AGENDAMENTOS</h3>
+
+<div class="row3">
+<div>
+<label>Data</label>
+<input id="agendaData" type="date">
+</div>
+<div>
+<label>Hora</label>
+<input id="agendaHora" type="time">
+</div>
+<div>
+<label>Tipo</label>
+<select id="agendaTipo">
+<option>CONSULTA</option>
+<option>PERÍCIA</option>
+<option>DIVERSO</option>
+</select>
+</div>
+</div>
+
+<div class="row">
+<div>
+<label>Nome</label>
+<input id="agendaNome">
+</div>
+<div>
+<label>CPF</label>
+<input id="agendaCpf" oninput="mascaraCPF(this)">
+</div>
+</div>
+
+<div class="row">
+<div>
+<label>Clínica</label>
+<select id="agendaClinica">
+<option></option><option>FEB</option><option>SÃO JUDAS TADEU</option><option>PREVIDAS</option><option>OUTRO</option>
+</select>
+</div>
+<div>
+<label>Especialidade</label>
+<select id="agendaEspecialidade">
+<option></option><option>ORTOPEDIA</option><option>PSIQUIATRIA</option><option>NEUROLOGIA</option><option>OFTALMOLOGIA</option><option>OUTRA</option>
+</select>
+</div>
+</div>
+
+<label>Cliente vai pagar laudo?</label>
+<select id="agendaVaiPagarLaudo"><option></option><option>SIM</option><option>NÃO</option></select>
+
+<label>Observação</label>
+<textarea id="agendaObs"></textarea>
+
+<button class="green" onclick="salvarAgenda()">SALVAR AGENDAMENTO</button>
+<div id="statusAgenda" class="small"></div>
+
+<div class="box">
+<button class="sec" onclick="carregarSemana()">ATUALIZAR AGENDA DA SEMANA</button>
+<div id="semana" class="week"></div>
+</div>
+</section>
+
+<section id="financeiro" class="card hidden">
+<h3>FINANCEIRO</h3>
+
+<label>CPF do cliente</label>
+<input id="finCpf" oninput="mascaraCPF(this)">
+
+<label>Benefício</label>
+<select id="finBeneficio">
+<option>BENEFÍCIO POR INCAPACIDADE</option>
+<option>AUXÍLIO-ACIDENTE</option>
+<option>BPC</option>
+<option>SALÁRIO-MATERNIDADE</option>
+<option>APOSENTADORIA</option>
+<option>PENSÃO POR MORTE</option>
+</select>
+
+<div class="row">
+<div>
+<label>Tipo de valor</label>
+<select id="finTipoValor">
+<option>PARCELA DO BENEFÍCIO</option>
+<option>RETROATIVO TOTAL</option>
+<option>PAGAMENTO ÚNICO</option>
+<option>CONVERSÃO PERMANENTE - RETROATIVO</option>
+<option>OUTRO</option>
+</select>
+</div>
+<div>
+<label>Nº parcela</label>
+<input id="finNumeroParcela" type="number">
+</div>
+</div>
+
+<label>Valor recebido/concedido</label>
+<input id="finValor" type="number" step="0.01">
+
+<div class="row">
+<div>
+<label>Data prevista pagamento</label>
+<input id="finDataPrevista" type="date">
+</div>
+<div>
+<label>Data pagamento</label>
+<input id="finDataPagamento" type="date">
+</div>
+</div>
+
+<label>Status pagamento</label>
+<select id="finStatus"><option>PENDENTE</option><option>PAGO</option><option>ATRASADO</option></select>
+
+<label>Observação</label>
+<textarea id="finObs"></textarea>
+
+<button class="green" onclick="lancarFinanceiro()">LANÇAR FINANCEIRO</button>
+<button class="sec" onclick="verFinanceiro()">VER FINANCEIRO DO CLIENTE</button>
+<div id="finResultado" class="box"></div>
+</section>
 
 </main>
 
@@ -176,7 +331,12 @@ let benefCount = 0;
 
 function $(id){return document.getElementById(id)}
 function digits(v){return String(v||"").replace(/\D/g,"")}
-function toggleComplementar(){ $("complementar").classList.toggle("hidden") }
+function resp(){return $("responsavel").value}
+function toggle(id){$(id).classList.toggle("hidden")}
+function show(id){
+["cadastro","busca","agenda","financeiro"].forEach(x=>$(x).classList.add("hidden"));
+$(id).classList.remove("hidden");
+}
 
 function mascaraCPF(el){
 let v=digits(el.value).slice(0,11);
@@ -218,6 +378,7 @@ div.innerHTML=`
 <option>PENSÃO POR MORTE</option>
 </select>
 <div id="hon_${i}"></div>
+<button class="red" onclick="document.getElementById('benef_${i}').remove()">REMOVER BENEFÍCIO</button>
 `;
 $("beneficiosArea").appendChild(div);
 $("beneficio_"+i).value=valor;
@@ -236,6 +397,19 @@ box.innerHTML=`
 </div>
 <label>% após as 8 primeiras parcelas</label>
 <input id="percAposIniciais_${i}" value="15" type="number">
+
+<label>Possibilidade de conversão em benefício permanente?</label>
+<select id="conversaoPermanente_${i}" onchange="toggleConv(${i})">
+<option>NÃO</option>
+<option>SIM</option>
+</select>
+
+<div id="convBox_${i}" class="hidden">
+<div class="row">
+<div><label>% retroativo da conversão</label><input id="percConversaoRetroativo_${i}" value="45" type="number"></div>
+<div><label>Nº parcelas integrais</label><input id="numConversaoParcelas_${i}" value="6" type="number"></div>
+</div>
+</div>
 `;
 } else if(b.includes("MATERNIDADE")){
 box.innerHTML=`
@@ -252,6 +426,10 @@ box.innerHTML=`
 }
 }
 
+function toggleConv(i){
+$("convBox_"+i).classList.toggle("hidden", $("conversaoPermanente_"+i).value!=="SIM");
+}
+
 function honorarios(){
 const itens=[];
 document.querySelectorAll("[id^='benef_']").forEach(card=>{
@@ -264,6 +442,9 @@ if(b.includes("INCAPACIDADE")){
 item.percInicial=+$("percInicial_"+i).value;
 item.numParcelasIniciais=+$("numParcelasIniciais_"+i).value;
 item.percAposIniciais=+$("percAposIniciais_"+i).value;
+item.conversaoPermanente=$("conversaoPermanente_"+i).value;
+item.percConversaoRetroativo=+$("percConversaoRetroativo_"+i)?.value || 45;
+item.numConversaoParcelas=+$("numConversaoParcelas_"+i)?.value || 6;
 } else if(b.includes("MATERNIDADE")){
 item.percMaternidade=+$("percMaternidade_"+i).value;
 item.numParcelasMaternidade=+$("numParcelasMaternidade_"+i).value;
@@ -283,8 +464,7 @@ if($("formaAssinatura").value==="D4SIGN") $("assinaturaARogo").value="NÃO";
 
 function montarDados(action){
 return {
-action:action,
-token:TOKEN,
+action, token:TOKEN,
 clienteNome:$("clienteNome").value,
 clienteCpf:digits($("clienteCpf").value),
 clienteDataNascimentoISO:$("clienteDataNascimentoISO").value,
@@ -304,44 +484,171 @@ tempoLaudo:$("tempoLaudo").value,
 qualidadeSegurado:$("qualidadeSegurado").value,
 estaTrabalhando:$("estaTrabalhando").value,
 origemCliente:$("origemCliente").value,
-responsavel:$("responsavel").value,
+responsavel:resp(),
 local:"Várzea Grande/MT",
 data:new Date().toLocaleDateString("pt-BR")
 };
 }
 
-function enviar(action){
+function enviarCadastro(action){
 const cpf=digits($("clienteCpf").value);
-if(!$("clienteNome").value || !cpf || !$("clienteDataNascimentoISO").value){
-alert("Preencha nome, CPF e data de nascimento.");
-return;
-}
-if(!validarCPF(cpf)){
-alert("CPF inválido.");
-return;
-}
+if(!$("clienteNome").value || !cpf || !$("clienteDataNascimentoISO").value){alert("Preencha nome, CPF e data de nascimento.");return;}
+if(!validarCPF(cpf)){alert("CPF inválido.");return;}
 
-let msg=`CONFIRA OS DADOS:\n\nNome: ${$("clienteNome").value}\nCPF: ${$("clienteCpf").value}\nNascimento: ${$("clienteDataNascimentoISO").value}\n\nConfirmar?`;
-if(!confirm(msg)) return;
-
+if(!confirm(`CONFIRA OS DADOS:\n\nNome: ${$("clienteNome").value}\nCPF: ${$("clienteCpf").value}\nNascimento: ${$("clienteDataNascimentoISO").value}\n\nConfirmar?`)) return;
 if(action==="cadastro_only" && !confirm("Contrato e procuração NÃO serão gerados. Confirmar somente cadastro?")) return;
 
-$("status").innerText="Enviando... aguarde alguns segundos.";
+$("statusCadastro").innerText="Enviando... aguarde alguns segundos.";
+fetch(URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(montarDados(action))})
+.then(()=>{$("statusCadastro").innerText="✔ Enviado. Confira a planilha e o Drive.";});
+}
 
-fetch(URL,{
-method:"POST",
-mode:"no-cors",
-headers:{"Content-Type":"text/plain"},
-body:JSON.stringify(montarDados(action))
-})
-.then(()=>{
-$("status").innerText="✔ Enviado. Confira a planilha e o Drive.";
+function jsonp(url){
+return new Promise((resolve,reject)=>{
+const cb="cb_"+Math.random().toString(36).slice(2);
+window[cb]=data=>{delete window[cb]; s.remove(); resolve(data)};
+const s=document.createElement("script");
+s.src=url+(url.includes("?")?"&":"?")+"callback="+cb;
+s.onerror=reject;
+document.body.appendChild(s);
 });
+}
+
+async function buscarCpf(){
+const cpf=digits($("buscaCpf").value);
+const r=await jsonp(`${URL}?action=lookup&cpf=${cpf}`);
+if(!r.found){$("resultadoBusca").innerHTML="Cliente não encontrado.";return;}
+renderCliente(r.data);
+}
+
+async function buscarNome(){
+const q=encodeURIComponent($("buscaNome").value);
+const r=await jsonp(`${URL}?action=search_name&q=${q}`);
+$("resultadoBusca").innerHTML=(r.items||[]).map(c=>`
+<div class="item"><b>${c.Nome}</b><br>CPF: ${c.CPF}<br>Benefício: ${c.Beneficios||""}
+<button onclick="carregarCliente('${c.CPF}')">ABRIR / EDITAR</button></div>`).join("");
+}
+
+async function carregarCliente(cpf){
+const r=await jsonp(`${URL}?action=lookup&cpf=${digits(cpf)}`);
+if(r.found) renderCliente(r.data);
+}
+
+function renderCliente(c){
+$("resultadoBusca").innerHTML=`
+<b>${c.Nome}</b><br>
+CPF: ${c.CPF}<br>
+Nascimento: ${c.DataNascimento||""}<br>
+Acesso GOV: ${c.AcessoGOV||""}<br>
+Benefícios: ${c.Beneficios||""}<br>
+Resultado: ${c.ResultadoProcesso||""}<br>
+<button onclick='preencher(${JSON.stringify(c).replace(/'/g,"")})'>CARREGAR NO FORMULÁRIO / EDITAR</button>
+${c.LinkPDF?`<button onclick="window.open('${c.LinkPDF}')">ABRIR PDF</button>`:""}
+`;
+$("finCpf").value=c.CPF;
+}
+
+function preencher(c){
+$("clienteNome").value=c.Nome||"";
+$("clienteCpf").value=c.CPF||"";
+mascaraCPF($("clienteCpf"));
+$("clienteDataNascimentoISO").value=c.DataNascimento||"";
+$("whatsapp").value=c.WhatsApp||"";
+$("clienteNacionalidade").value=c.Nacionalidade||"BRASILEIRA";
+$("clienteEstadoCivil").value=c.EstadoCivil||"";
+$("clienteEndereco").value=c.Endereco||"";
+$("clienteUF").value=c.UF||"MT";
+$("govAcesso").value=c.AcessoGOV||"";
+$("formaAssinatura").value=c.FormaAssinatura||"MANUAL";
+$("assinaturaARogo").value=c.AssinaturaARogo||"NÃO";
+$("especialidadeMedica").value=c.EspecialidadeMedica||"";
+$("doencaObservacao").value=c.ObservacaoDoenca||"";
+$("possuiLaudo").value=c.PossuiLaudo||"";
+$("tempoLaudo").value=c.TempoLaudo||"";
+$("qualidadeSegurado").value=c.QualidadeSegurado||"";
+$("estaTrabalhando").value=c.EstaTrabalhando||"";
+$("origemCliente").value=c.OrigemCliente||"";
+toggleRogo();
+show("cadastro");
+}
+
+async function listarClientes(ordem){
+const r=await jsonp(`${URL}?action=listar_clientes&ordem=${ordem}`);
+$("listaClientes").innerHTML=(r.items||[]).map(c=>`<div class="item"><b>${c.Nome}</b><br>CPF: ${c.CPF}<br>${c.Beneficios||""}</div>`).join("");
+}
+
+function salvarAgenda(){
+const p={
+action:"agenda_create", token:TOKEN, responsavel:resp(),
+dataAgendamento:$("agendaData").value, hora:$("agendaHora").value, tipo:$("agendaTipo").value,
+nome:$("agendaNome").value, cpf:digits($("agendaCpf").value),
+clinica:$("agendaClinica").value, especialidade:$("agendaEspecialidade").value,
+vaiPagarLaudo:$("agendaVaiPagarLaudo").value, observacao:$("agendaObs").value
+};
+fetch(URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(p)})
+.then(()=>{$("statusAgenda").innerText="✔ Agendamento enviado.";});
+}
+
+function mondayISO(){
+const d=new Date(); const day=d.getDay(); const diff=d.getDate()-day+(day===0?-6:1);
+d.setDate(diff); return d.toISOString().slice(0,10);
+}
+
+async function carregarSemana(){
+const inicio=mondayISO();
+const r=await jsonp(`${URL}?action=agenda&inicio=${inicio}&dias=6`);
+const dias=["SEG","TER","QUA","QUI","SEX","SAB"];
+$("semana").innerHTML="";
+for(let i=0;i<6;i++){
+const d=new Date(inicio+"T00:00:00"); d.setDate(d.getDate()+i);
+const iso=d.toISOString().slice(0,10);
+const box=document.createElement("div"); box.className="day";
+box.innerHTML=`<b>${dias[i]} - ${d.toLocaleDateString("pt-BR").slice(0,5)}</b>`;
+(r.items||[]).filter(x=>String(x.DataAgendamento).slice(0,10)===iso).forEach(a=>{
+box.innerHTML+=`<div class="small">${a.Hora||""} - ${a.Nome||""}<br>${a.Tipo||""} ${a.Clinica||""}</div>`;
+});
+$("semana").appendChild(box);
+}
+}
+
+function lancarFinanceiro(){
+const p={
+action:"financeiro_lancar", token:TOKEN, responsavel:resp(),
+clienteCpf:digits($("finCpf").value),
+beneficio:$("finBeneficio").value,
+tipoValor:$("finTipoValor").value,
+numeroParcela:$("finNumeroParcela").value,
+valorBaseRecebido:$("finValor").value,
+dataPrevistaPagamento:$("finDataPrevista").value,
+dataPagamento:$("finDataPagamento").value,
+statusPagamento:$("finStatus").value,
+observacao:$("finObs").value,
+resultadoProcesso:"CONCEDIDO"
+};
+fetch(URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(p)})
+.then(()=>{$("finResultado").innerHTML="✔ Lançamento enviado. Confira a aba FINANCEIRO.";});
+}
+
+async function verFinanceiro(){
+const cpf=digits($("finCpf").value);
+const r=await jsonp(`${URL}?action=financeiro_cliente&cpf=${cpf}`);
+const d=r.data||{};
+const res=d.resumo||{};
+$("finResultado").innerHTML=`
+<div><b>Resumo</b><br>
+Total recebido cliente: R$ ${(res.TotalRecebidoCliente||0).toFixed(2)}<br>
+Total honorários: R$ ${(res.TotalHonorarios||0).toFixed(2)}<br>
+Total pago: R$ ${(res.TotalPago||0).toFixed(2)}<br>
+Saldo pendente: R$ ${(res.SaldoPendente||0).toFixed(2)}</div>
+${(d.items||[]).map(i=>`<div class="item">${i.Beneficio} - ${i.TipoValor} - Honorários: R$ ${i.ValorHonorarioCalculado}</div>`).join("")}
+`;
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
 addBeneficio();
 toggleRogo();
+$("agendaData").value=new Date().toISOString().slice(0,10);
+carregarSemana();
 });
 </script>
 
