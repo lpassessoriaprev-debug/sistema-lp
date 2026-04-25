@@ -7,41 +7,37 @@
     <style>
         /* PALETA DE CORES INSTITUCIONAL BRC */
         :root { 
-            --primary: #1a365d; /* Azul Marinho Escuro (Confiança/Seriedade) */
-            --secondary: #2b6cb0; /* Azul Metálico (Ações e Destaques) */
-            --accent: #2f855a; /* Verde Sucesso */
-            --danger: #c53030; /* Vermelho Alerta */
-            --warning: #d69e2e; /* Amarelo Atenção */
-            --bg-page: #edf2f7; /* Cinza Frio (Fundo da página) */
-            --bg-card: #ffffff; /* Branco puro */
-            --text-main: #2d3748; /* Grafite (Leitura) */
+            --primary: #1a365d; 
+            --secondary: #2b6cb0; 
+            --accent: #2f855a; 
+            --danger: #c53030; 
+            --warning: #d69e2e; 
+            --bg-page: #edf2f7; 
+            --bg-card: #ffffff; 
+            --text-main: #2d3748; 
             --border-light: #e2e8f0; 
         }
 
         * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: var(--bg-page); color: var(--text-main); margin: 0; padding: 0; line-height: 1.5; }
         
-        /* HEADER */
         header { background-color: var(--primary); color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
         .header-title { font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; }
         .user-selector select { padding: 6px 12px; border-radius: 4px; border: 1px solid #fff; background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; cursor: pointer; outline: none; }
         .user-selector select option { color: #333; }
 
-        /* CONTAINER E GRID PRINCIPAL */
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .menu-btn { background: var(--bg-card); border: 2px solid var(--border-light); border-bottom: 4px solid var(--secondary); padding: 18px; text-align: center; font-weight: 700; color: var(--secondary); cursor: pointer; transition: all 0.2s ease; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .menu-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .menu-btn.active { background: var(--secondary); color: #fff; border-color: var(--primary); border-bottom-color: var(--primary); }
 
-        /* CARDS (ABAS DO SISTEMA) */
         .card { background: var(--bg-card); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; overflow: hidden; display: none; border: 1px solid var(--border-light); }
         .card.active { display: block; animation: fadeIn 0.3s ease; }
         .card-header { background: #f8fafc; color: var(--primary); padding: 18px 25px; font-weight: 800; border-bottom: 1px solid var(--border-light); font-size: 1.1rem; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;}
         .card-body { padding: 30px 25px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* FORMULÁRIOS */
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px;}
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; color: #1e293b; background: #fff; transition: border-color 0.2s; }
@@ -50,47 +46,56 @@
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
         @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 15px; } }
 
-        /* BOTÕES */
         .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.2s; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; }
         .btn-primary { background: var(--secondary); color: white; }
         .btn-success { background: var(--accent); color: white; }
         .btn-warning { background: var(--warning); color: #fff; }
         .btn-danger { background: var(--danger); color: white; }
+        .btn-info { background: #0ea5e9; color: white; }
         .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 4px; }
         .btn:hover { filter: brightness(110%); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn:active { transform: translateY(0); }
+        .btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; color: #94a3b8; }
 
-        /* BLOCO DE BENEFÍCIOS (CORRIGIDO E ORGANIZADO) */
         .beneficio-box { border: 1px solid var(--secondary); padding: 20px; border-radius: 8px; background: #f0f4f8; margin-bottom: 20px; position: relative; border-left: 5px solid var(--secondary); }
         .beneficio-header { font-weight: 800; margin-bottom: 15px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #cbd5e1; padding-bottom: 10px;}
         .campos-dinamicos { margin-top: 15px; background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; }
 
-        /* BLOCO REPRESENTANTE LEGAL */
         .rep-box { background: #fffbeb; border: 1px solid #fde68a; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--warning); display: none; }
         .rep-box h4 { margin-top: 0; color: #92400e; margin-bottom: 15px; text-transform: uppercase; font-size: 0.9rem; }
 
-        /* TABELAS */
         .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-light); }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: #fff; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-light); }
         th { background: #f8fafc; font-weight: 700; color: #475569; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
         tr:hover td { background: #f1f5f9; }
 
-        /* FICHA DO CLIENTE */
         .ficha-section { padding: 25px; border-bottom: 1px solid var(--border-light); }
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
         .info-item { background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; }
         .info-label { font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; display: block; }
         .info-value { font-size: 1.05rem; color: var(--primary); font-weight: 600; word-break: break-word; }
 
-        /* MODAIS */
+        /* DRE Financeiro (Cards) */
+        .dre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .dre-card { padding: 20px; border-radius: 8px; color: white; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .dre-receita { background: linear-gradient(135deg, #2f855a, #22543d); }
+        .dre-despesa { background: linear-gradient(135deg, #c53030, #742a2a); }
+        .dre-lucro { background: linear-gradient(135deg, #2b6cb0, #1a365d); }
+        .dre-title { font-size: 0.85rem; text-transform: uppercase; font-weight: bold; opacity: 0.9; margin-bottom: 5px; }
+        .dre-value { font-size: 1.5rem; font-weight: 800; }
+        @media (max-width: 768px) { .dre-grid { grid-template-columns: 1fr; } }
+
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .status-agendado { background: #d1fae5; color: #065f46; }
+        .status-cancelado { background: #fee2e2; color: #991b1b; text-decoration: line-through; }
+
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.7); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background-color: #fff; padding: 30px; border-radius: 12px; width: 95%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-content { background-color: #fff; padding: 30px; border-radius: 12px; width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .modal-close { position: absolute; right: 20px; top: 20px; font-size: 24px; font-weight: bold; cursor: pointer; color: #94a3b8; transition: 0.2s; }
         .modal-close:hover { color: var(--danger); }
         .modal h3 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--bg-page); padding-bottom: 15px; font-size: 1.2rem; }
 
-        /* LOADING SUPERIOR */
         #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 3000; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { width: 60px; height: 60px; border: 4px solid #e2e8f0; border-top: 4px solid var(--secondary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -99,10 +104,10 @@
 </head>
 <body>
 
-<div id="loader"><div class="spinner"></div><div class="loader-text">Sincronizando Sistema BRC...</div></div>
+<div id="loader"><div class="spinner"></div><div class="loader-text">A Sincronizar Sistema BRC...</div></div>
 
 <header>
-    <div class="header-title">BRC ADVOCACIA <span style="font-weight:400; font-size:0.9rem; opacity:0.8;">| CRM Previdenciário</span></div>
+    <div class="header-title">BRC ADVOCACIA <span style="font-weight:400; font-size:0.9rem; opacity:0.8;">| Gestão Previdenciária</span></div>
     <div class="user-selector">
         <select id="selectUsuario">
             <option value="BRUNO">Dr. BRUNO</option>
@@ -132,6 +137,25 @@
                     <div class="form-group"><label>WhatsApp</label><input type="text" id="whatsapp" placeholder="(00) 00000-0000"></div>
                     <div class="form-group"><label>Senha Meu INSS (GOV)</label><input type="text" id="acessoGov"></div>
                 </div>
+                
+                <div class="grid-3">
+                    <div class="form-group" style="grid-column: 1 / 4; background:#f0fdf4; padding:10px; border-radius:6px; border:1px solid #bbf7d0;">
+                        <label style="color:#166534;">Fase Atual do Processo / Status</label>
+                        <select id="faseProcesso" style="border-color:#86efac; font-weight:bold; color:#166534;">
+                            <option value="TRIAGEM/ANÁLISE">TRIAGEM / ANÁLISE</option>
+                            <option value="AGUARDANDO DOCUMENTOS">AGUARDANDO DOCUMENTOS</option>
+                            <option value="REQUERIMENTO INSS PROTOCOLADO">REQUERIMENTO INSS PROTOCOLADO</option>
+                            <option value="EXIGÊNCIA INSS">EXIGÊNCIA INSS</option>
+                            <option value="AGUARDANDO PERÍCIA">AGUARDANDO PERÍCIA</option>
+                            <option value="RECURSO ADMINISTRATIVO">RECURSO ADMINISTRATIVO</option>
+                            <option value="JUDICIALIZADO">JUDICIALIZADO</option>
+                            <option value="CUMPRIMENTO DE SENTENÇA">CUMPRIMENTO DE SENTENÇA</option>
+                            <option value="FINALIZADO / CONCEDIDO">FINALIZADO / CONCEDIDO</option>
+                            <option value="ENCERRADO / ARQUIVADO">ENCERRADO / ARQUIVADO</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="grid-3">
                     <div class="form-group"><label>Nacionalidade</label><input type="text" id="nacionalidade" value="BRASILEIRA" style="text-transform: uppercase;"></div>
                     <div class="form-group"><label>Estado Civil</label><select id="estadoCivil"><option value="SOLTEIRO(A)">SOLTEIRO(A)</option><option value="CASADO(A)">CASADO(A)</option><option value="DIVORCIADO(A)">DIVORCIADO(A)</option><option value="VIÚVO(A)">VIÚVO(A)</option><option value="UNIÃO ESTÁVEL">UNIÃO ESTÁVEL</option></select></div>
@@ -181,7 +205,7 @@
             </div>
             <div class="table-responsive">
                 <table id="tabelaClientes">
-                    <thead><tr><th>Cliente</th><th>CPF</th><th>Benefícios Cadastrados</th><th>Ações Rápidas</th></tr></thead>
+                    <thead><tr><th>Cliente</th><th>CPF</th><th>Fase do Processo</th><th>Benefícios Cadastrados</th><th>Ações</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -196,7 +220,7 @@
             <button class="btn btn-success" onclick="abrirModalAgenda('', '')" style="margin-bottom: 20px;">+ NOVO AGENDAMENTO GERAL</button>
             <div class="table-responsive">
                 <table id="tabelaAgenda">
-                    <thead><tr><th>Data</th><th>Hora</th><th>Tipo</th><th>Cliente</th><th>CPF</th><th>Local/Clínica</th><th>Responsável</th></tr></thead>
+                    <thead><tr><th>Data</th><th>Hora</th><th>Tipo</th><th>Cliente</th><th>CPF</th><th>Local/Clínica</th><th>Status</th><th>Ações</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -213,7 +237,7 @@
             <div class="grid-2"><div class="form-group"><label>Data Prevista</label><input type="date" id="agData"></div><div class="form-group"><label>Horário</label><input type="time" id="agHora"></div></div>
             <div class="form-group"><label>Tipo de Evento</label><select id="agTipo"><option value="CONSULTA">CONSULTA MÉDICA</option><option value="PERÍCIA">PERÍCIA INSS/JUDICIAL</option><option value="ATENDIMENTO">ATENDIMENTO/DIVERSOS</option></select></div>
             <div class="grid-2"><div class="form-group"><label>CPF do Cliente</label><input type="text" id="agCpf" oninput="mascaraCPF(this)"></div><div class="form-group"><label>Nome do Cliente</label><input type="text" id="agNome" style="text-transform: uppercase;"></div></div>
-            <div class="grid-2"><div class="form-group"><label>Local (Ex: INSS, FEB)</label><input type="text" id="agClinica" style="text-transform: uppercase;"></div><div class="form-group"><label>Observações Adicionais</label><input type="text" id="agObs"></div></div>
+            <div class="grid-2"><div class="form-group"><label>Local (Ex: INSS, FEB)</label><input type="text" id="agClinica" style="text-transform: uppercase;"></div><div class="form-group"><label>Observações</label><input type="text" id="agObs"></div></div>
             <button type="button" class="btn btn-success" style="width:100%; padding:15px; margin-top: 10px;" onclick="salvarAgendamento()">CONFIRMAR AGENDAMENTO</button>
         </form>
     </div>
@@ -222,23 +246,60 @@
 <div id="modalFinanceiro" class="modal">
     <div class="modal-content">
         <span class="modal-close" onclick="fecharModal('modalFinanceiro')">&times;</span>
-        <h3>REGISTRAR ENTRADA FINANCEIRA</h3>
+        <h3>LANÇAMENTO FINANCEIRO</h3>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn btn-success" style="flex:1" onclick="alterarNaturezaFin('RECEITA')">ENTRADA (HONORÁRIOS)</button>
+            <button class="btn btn-danger" style="flex:1" onclick="alterarNaturezaFin('DESPESA')">SAÍDA (CUSTOS/DESPESAS)</button>
+        </div>
+
         <form id="formFinanceiro">
+            <input type="hidden" id="finNatureza" value="RECEITA">
             <div class="grid-2"><div class="form-group"><label>CPF</label><input type="text" id="finCpf" readonly style="background:#f1f5f9"></div><div class="form-group"><label>Cliente</label><input type="text" id="finNome" readonly style="background:#f1f5f9"></div></div>
-            <div class="grid-2">
-                <div class="form-group"><label>Referente ao Benefício</label><input type="text" id="finBeneficio" style="text-transform: uppercase;"></div>
-                <div class="form-group"><label>Categoria do Pagamento</label><select id="finTipoValor"><option value="RETROATIVO TOTAL">RETROATIVO TOTAL</option><option value="PARCELA MENSAL">PARCELA MENSAL (Manutenção)</option><option value="CONVERSÃO PERMANENTE">CONVERSÃO EM PERMANENTE</option></select></div>
+            
+            <div id="blocoReceita">
+                <div class="grid-2">
+                    <div class="form-group"><label>Referente ao Benefício</label><input type="text" id="finBeneficio" style="text-transform: uppercase;"></div>
+                    <div class="form-group"><label>Categoria do Recebimento</label><select id="finCatReceita"><option value="RETROATIVO TOTAL">RETROATIVO TOTAL</option><option value="PARCELA MENSAL">PARCELA MENSAL (Manutenção)</option><option value="CONVERSÃO PERMANENTE">CONVERSÃO EM PERMANENTE</option><option value="HONORÁRIO INICIAL">HONORÁRIO INICIAL/CONSULTA</option></select></div>
+                </div>
+                <div class="grid-2"><div class="form-group"><label>Valor Bruto do Cliente (R$)</label><input type="number" id="finValorBruto" placeholder="0.00" step="0.01" oninput="calcularHon()"></div><div class="form-group"><label>% Contrato BRC</label><input type="number" id="finPerc" placeholder="30" oninput="calcularHon()"></div></div>
+                <div class="grid-3">
+                    <div class="form-group"><label>Calculado (R$)</label><input type="number" id="finValorHonorario" readonly style="background:#f1f5f9"></div>
+                    <div class="form-group"><label>Desconto Concedido (R$)</label><input type="number" id="finDesconto" placeholder="0.00" step="0.01" oninput="calcularHon()"></div>
+                    <div class="form-group"><label>Valor Final (R$)</label><input type="number" id="finValorFinalRec" readonly style="background:#fefcbf; color:#975a16; font-weight:bold;"></div>
+                </div>
             </div>
-            <div class="grid-2"><div class="form-group"><label>Valor Bruto do Cliente (R$)</label><input type="number" id="finValorBruto" placeholder="0.00" step="0.01" oninput="calcularHon()"></div><div class="form-group"><label>% Contrato BRC</label><input type="number" id="finPerc" placeholder="30" oninput="calcularHon()"></div></div>
-            <div class="grid-2"><div class="form-group"><label>Valor Devido ao Escritório (R$)</label><input type="number" id="finValorHonorario" readonly style="background:#fefcbf; color:#975a16; font-weight:bold;"></div><div class="form-group"><label>Status do Repasse</label><select id="finStatus"><option value="PAGO">RECEBIDO / PAGO</option><option value="PENDENTE">AGUARDANDO REPASSE</option></select></div></div>
-            <button type="button" class="btn btn-primary" style="width:100%; padding:15px; margin-top: 10px;" onclick="salvarFinanceiro()">SALVAR REGISTRO FINANCEIRO</button>
+
+            <div id="blocoDespesa" style="display: none; background:#fef2f2; border:1px solid #fecaca; padding:15px; border-radius:6px; margin-bottom:15px;">
+                <div class="grid-2">
+                    <div class="form-group"><label>Categoria do Gasto</label>
+                        <select id="finCatDespesa">
+                            <option value="CONSULTA MÉDICA">CONSULTA MÉDICA</option>
+                            <option value="PERÍCIA PARTICULAR">PERÍCIA PARTICULAR</option>
+                            <option value="TRANSPORTE / UBER">TRANSPORTE / UBER</option>
+                            <option value="CÓPIAS / DOCUMENTOS">CÓPIAS / DOCUMENTOS</option>
+                            <option value="CUSTAS JUDICIAIS">CUSTAS JUDICIAIS</option>
+                            <option value="ADIANTAMENTO">ADIANTAMENTO AO CLIENTE</option>
+                            <option value="OUTRO">OUTRO GASTO</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Valor do Custo (R$)</label><input type="number" id="finValorFinalDes" placeholder="0.00" step="0.01" style="border-color:#ef4444;"></div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group"><label>Observação Breve</label><input type="text" id="finObs"></div>
+                <div class="form-group"><label>Status do Lançamento</label><select id="finStatus"><option value="PAGO">EFETIVADO / PAGO</option><option value="PENDENTE">PENDENTE</option></select></div>
+            </div>
+            
+            <button type="button" class="btn btn-primary" id="btnSalvarFin" style="width:100%; padding:15px; margin-top: 10px;" onclick="salvarFinanceiro()">SALVAR REGISTRO</button>
         </form>
     </div>
 </div>
 
 <script>
     // URL DEFINITIVA DO BACKEND APPS SCRIPT
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZ34COd5hk-FYzimRVgDOW_LIun0HrF-qA27WDDtPd7WEfFVxfvgmWL1zBgGd9TWulkw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyivWzencbFZfdTU093ubIXO6oqkER1eit95Xy7-9DN_xz4SrnB5dR7EnUZzjZY4gx5qg/exec";
     
     let listaClientesLocal = [];
 
@@ -272,7 +333,7 @@
         i.setAttribute("maxlength", "14"); if (v.length == 3 || v.length == 7) i.value += "."; if (v.length == 11) i.value += "-";
     }
 
-    // --- ENGENHARIA DE BENEFÍCIOS (ROBUSTA) ---
+    // --- ENGENHARIA DE BENEFÍCIOS ---
     function adicionarBeneficioUI(tipoSelecionado = "BENEFÍCIO POR INCAPACIDADE", dadosJSON = null) {
         const idBox = `ben_box_${Date.now()}_${Math.floor(Math.random()*1000)}`;
         
@@ -296,18 +357,14 @@
                     <label>Selecione a Categoria do Benefício:</label>
                     ${selectHTML}
                 </div>
-                <div class="campos-dinamicos" id="campos_dinamicos_${idBox}">
-                    </div>
+                <div class="campos-dinamicos" id="campos_dinamicos_${idBox}"></div>
             </div>`;
         
         document.getElementById('containerBeneficios').insertAdjacentHTML('beforeend', html);
-        
-        // Renderiza os inputs específicos e popula os dados se for edição
         renderizarCamposInternos(idBox, tipoSelecionado, dadosJSON);
     }
 
     function renderizarCamposInternos(idBox, tipo, dadosJSON = null) {
-        // Atualiza a tag de dados do box principal para facilitar a leitura no salvamento
         document.getElementById(idBox).setAttribute('data-type', tipo);
         const container = document.getElementById(`campos_dinamicos_${idBox}`);
         let html = '';
@@ -340,7 +397,6 @@
             const percMat = dadosJSON ? dadosJSON.percentual : 30;
             html = `<div class="grid-2"><div class="form-group"><label>% Total dos Honorários</label><input type="number" class="p-mat" value="${percMat}"></div></div>`;
         } else {
-            // Aposentadoria, BPC, Pensao, Acidente
             const percRet = dadosJSON ? dadosJSON.percentualRetroativo : 45;
             const parInt = dadosJSON ? dadosJSON.numParcelasIntegrais : 6;
             html = `
@@ -352,15 +408,14 @@
         container.innerHTML = html;
     }
 
-    // --- LEITURA E SALVAMENTO ---
+    // --- SALVAMENTO DE CADASTRO ---
     function confirmarAcao(acao) {
         const nome = document.getElementById('nome').value;
         const cpf = document.getElementById('cpf').value;
-        if(!nome || !cpf) { alert("Nome e CPF são campos obrigatórios para o cadastro!"); return; }
+        if(!nome || !cpf) { alert("Nome e CPF são campos obrigatórios para o registo!"); return; }
         
         document.getElementById('loader').style.display = 'flex';
         
-        // Constrói objeto de benefícios a partir da UI montada
         const beneficios = []; 
         const honorarios = {};
         
@@ -389,7 +444,7 @@
 
         if(beneficios.length === 0) {
             document.getElementById('loader').style.display = 'none';
-            alert("Adicione ao menos um benefício para gerar o contrato.");
+            alert("Adicione pelo menos um benefício para gerar o contrato.");
             return;
         }
 
@@ -405,6 +460,7 @@
             endereco: document.getElementById('endereco').value,
             uf: document.getElementById('uf').value,
             acessoGov: document.getElementById('acessoGov').value,
+            faseProcesso: document.getElementById('faseProcesso').value,
             temRepresentante: document.getElementById('temRepresentante').value,
             repNome: document.getElementById('repNome').value,
             repCPF: document.getElementById('repCPF').value,
@@ -423,12 +479,12 @@
             if(acao !== 'regerar_documento') limparFormulario(); 
         })
         .catch(() => { 
-            alert("Falha de rede. Verifique sua conexão."); 
+            alert("Falha de rede. Verifique a sua ligação."); 
             document.getElementById('loader').style.display = 'none'; 
         });
     }
 
-    // --- FUNÇÕES DE LISTAGEM E FICHA ---
+    // --- FUNÇÕES DE LISTAGEM ---
     function carregarListaCompleta() {
         document.getElementById('loader').style.display = 'flex';
         const s = document.createElement('script'); s.src = `${SCRIPT_URL}?action=listar_clientes&callback=renderLista`; document.body.appendChild(s);
@@ -443,9 +499,10 @@
                 tb.innerHTML += `<tr>
                     <td><strong>${c.Nome}</strong></td>
                     <td>${c.CPF}</td>
+                    <td><span class="status-badge status-agendado">${c.FaseProcesso || 'TRIAGEM'}</span></td>
                     <td><span style="font-size:0.8rem; background:#e2e8f0; padding:2px 6px; border-radius:4px;">${c.Beneficios}</span></td>
                     <td>
-                        <button class="btn btn-info btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA</button>
+                        <button class="btn btn-info btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button>
                         <button class="btn btn-warning btn-sm" onclick="editarCliente('${c.CPF}')">EDITAR</button>
                     </td>
                 </tr>`;
@@ -459,7 +516,7 @@
         renderLista({ status: "success", data: filt });
     }
 
-    // --- RECONSTRUÇÃO DA EDIÇÃO ---
+    // --- EDIÇÃO (RECONSTRUÇÃO DA TELA) ---
     function editarCliente(cpf) {
         const c = listaClientesLocal.find(x => x.CPF === cpf);
         if(!c) return;
@@ -467,7 +524,6 @@
         toggleCard('cardCadastro', document.querySelectorAll('.menu-btn')[0]);
         window.scrollTo(0,0);
         
-        // Povoando text inputs básicos
         document.getElementById('nome').value = c.Nome;
         document.getElementById('cpf').value = c.CPF;
         document.getElementById('whatsapp').value = c.WhatsApp || "";
@@ -476,12 +532,12 @@
         document.getElementById('estadoCivil').value = c.EstadoCivil || "SOLTEIRO(A)";
         document.getElementById('endereco').value = c.Endereco || "";
         document.getElementById('uf').value = c.UF || "MT";
+        document.getElementById('faseProcesso').value = c.FaseProcesso || "TRIAGEM/ANÁLISE";
         
         if(c.DataNascimento && c.DataNascimento.includes('/')) {
             let p = c.DataNascimento.split('/'); document.getElementById('dataNascimento').value = `${p[2]}-${p[1]}-${p[0]}`;
         }
         
-        // Representante
         const temRep = c.TemRepresentante || "NÃO";
         document.getElementById('temRepresentante').value = temRep;
         toggleRepresentante(temRep);
@@ -490,24 +546,18 @@
         document.getElementById('repRG').value = c.RepRG || "";
         document.getElementById('repParentesco').value = c.RepParentesco || "";
 
-        // Reconstruindo os blocos visuais de benefícios baseados no JSON!
         document.getElementById('containerBeneficios').innerHTML = "";
         try {
             const hons = JSON.parse(c.HonorariosJSON);
             for(let keyTipo in hons) {
-                // keyTipo = "BENEFÍCIO POR INCAPACIDADE", etc.
-                // hons[keyTipo] = objeto com os valores percentuais
                 adicionarBeneficioUI(keyTipo, hons[keyTipo]);
             }
-        } catch(e) { 
-            // Fallback se JSON estiver quebrado
-            adicionarBeneficioUI(); 
-        }
+        } catch(e) { adicionarBeneficioUI(); }
         
         document.getElementById('btnRegerar').style.display = "inline-flex";
     }
 
-    // --- FICHA DETALHADA E MODAIS ---
+    // --- FICHA DETALHADA E DRE FINANCEIRO ---
     function abrirFicha(cpf) {
         document.getElementById('loader').style.display = 'flex';
         const s = document.createElement('script'); s.src = `${SCRIPT_URL}?action=carregar_ficha&cpf=${cpf}&callback=renderFicha`; document.body.appendChild(s);
@@ -517,6 +567,18 @@
         document.getElementById('loader').style.display = 'none';
         if(res.status !== "success") return;
         const c = res.cliente; const fin = res.financeiro; const ag = res.agenda;
+        
+        // CALCULO DO DRE (Demonstrativo de Resultado do Exercício)
+        let totReceita = 0, totDespesa = 0;
+        fin.forEach(f => {
+            if(f.StatusPagamento === 'PAGO') {
+                let val = parseFloat(f.ValorFinal) || 0;
+                if(f.Natureza === 'RECEITA') totReceita += val;
+                else if(f.Natureza === 'DESPESA') totDespesa += val;
+            }
+        });
+        let lucro = totReceita - totDespesa;
+
         const div = document.getElementById('cardFichaCliente');
         
         let html = `
@@ -528,31 +590,55 @@
                     <div class="info-item"><span class="info-label">WhatsApp</span><span class="info-value">${c.WhatsApp || '-'}</span></div>
                     <div class="info-item" style="background:#f0fdf4; border-color:#86efac;"><span class="info-label" style="color:#166534;">Senha GOV</span><span class="info-value" style="color:#166534;">${c.AcessoGOV || '-'}</span></div>
                     <div class="info-item"><span class="info-label">Benefícios</span><span class="info-value">${c.Beneficios}</span></div>
+                    <div class="info-item" style="background:#fffbeb; border-color:#fde68a;"><span class="info-label" style="color:#92400e;">Fase do Processo</span><span class="info-value" style="color:#92400e;">${c.FaseProcesso || 'TRIAGEM'}</span></div>
                 </div>
-                ${c.LinkPDF ? `<br><a href="${c.LinkPDF}" target="_blank" class="btn btn-primary btn-sm">BAIXAR PDF DO CONTRATO</a>` : ''}
+                <div style="margin-top:20px; display:flex; gap:10px;">
+                    ${c.LinkPastaPrincipal ? `<a href="${c.LinkPastaPrincipal}" target="_blank" class="btn btn-info">📂 ABRIR PASTA DO DRIVE</a>` : ''}
+                    ${c.LinkPDF ? `<a href="${c.LinkPDF}" target="_blank" class="btn btn-primary">📄 BAIXAR PDF</a>` : ''}
+                </div>
             </div>
+            
             <div class="ficha-section">
-                <h3 style="color:var(--accent); margin-top:0;">HISTÓRICO FINANCEIRO</h3>
-                <button class="btn btn-success btn-sm" onclick="document.getElementById('modalFinanceiro').style.display='flex'; document.getElementById('finCpf').value='${c.CPF}'; document.getElementById('finNome').value='${c.Nome}';">LANCAR ENTRADA</button>
+                <h3 style="color:var(--primary); margin-top:0;">RESUMO FINANCEIRO (DRE)</h3>
+                <div class="dre-grid">
+                    <div class="dre-card dre-receita"><div class="dre-title">Total Faturado (Honorários)</div><div class="dre-value">R$ ${totReceita.toFixed(2)}</div></div>
+                    <div class="dre-card dre-despesa"><div class="dre-title">Custos do Escritório (Despesas)</div><div class="dre-value">R$ ${totDespesa.toFixed(2)}</div></div>
+                    <div class="dre-card dre-lucro"><div class="dre-title">Lucro Líquido Real</div><div class="dre-value">R$ ${lucro.toFixed(2)}</div></div>
+                </div>
+                
+                <button class="btn btn-success btn-sm" onclick="abrirModalFin('${c.CPF}', '${c.Nome}', 'RECEITA')">+ LANÇAR HONORÁRIO (ENTRADA)</button>
+                <button class="btn btn-danger btn-sm" onclick="abrirModalFin('${c.CPF}', '${c.Nome}', 'DESPESA')">- LANÇAR CUSTO (SAÍDA)</button>
+                
                 <div class="table-responsive" style="margin-top:15px;">
-                    <table><thead><tr><th>Data</th><th>Espécie</th><th>Bruto Recebido</th><th>Honorários BRC</th><th>Status Repasse</th></tr></thead><tbody>`;
-        if(fin.length===0) html+=`<tr><td colspan="5">Sem registros financeiros.</td></tr>`;
-        else fin.forEach(f=>{ html+=`<tr><td>${f.DataRegistro.split(' ')[0]}</td><td>${f.TipoValor}</td><td>R$ ${f.ValorBaseRecebido}</td><td><strong>R$ ${f.ValorHonorarioCalculado}</strong></td><td><span style="color:${f.StatusPagamento==='PAGO'?'green':'red'}">${f.StatusPagamento}</span></td></tr>`; });
+                    <table><thead><tr><th>Data</th><th>Natureza</th><th>Categoria</th><th>Valor Líquido</th><th>Status</th></tr></thead><tbody>`;
+        if(fin.length===0) html+=`<tr><td colspan="5">Sem registos financeiros.</td></tr>`;
+        else fin.forEach(f=>{ 
+            let corNat = f.Natureza === 'RECEITA' ? 'green' : 'red';
+            html+=`<tr><td>${f.DataRegistro.split(' ')[0]}</td><td><strong style="color:${corNat}">${f.Natureza}</strong></td><td>${f.Categoria}</td><td><strong>R$ ${f.ValorFinal}</strong></td><td><span class="status-badge ${f.StatusPagamento==='PAGO'?'status-agendado':'status-cancelado'}">${f.StatusPagamento}</span></td></tr>`; 
+        });
         html+=`</tbody></table></div></div>
             <div class="ficha-section">
                 <h3 style="color:var(--secondary); margin-top:0;">AGENDA / PERÍCIAS DO CLIENTE</h3>
                 <button class="btn btn-primary btn-sm" onclick="abrirModalAgenda('${c.CPF}', '${c.Nome}')">AGENDAR COMPROMISSO</button>
                 <div class="table-responsive" style="margin-top:15px;">
-                    <table><thead><tr><th>Data Prevista</th><th>Hora</th><th>Natureza</th><th>Local/Clínica</th><th>Anotações</th></tr></thead><tbody>`;
-        if(ag.length===0) html+=`<tr><td colspan="5">Sem agendamentos futuros ou passados.</td></tr>`;
-        else ag.forEach(a=>{ html+=`<tr><td>${a.DataAgendamento}</td><td>${a.Hora}</td><td>${a.Tipo}</td><td>${a.Clinica}</td><td>${a.Observacao}</td></tr>`; });
+                    <table><thead><tr><th>Data Prevista</th><th>Hora</th><th>Natureza</th><th>Local/Clínica</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
+        if(ag.length===0) html+=`<tr><td colspan="6">Sem agendamentos futuros ou passados.</td></tr>`;
+        else ag.forEach(a=>{ 
+            let statusClasse = a.Status === 'CANCELADO' ? 'status-cancelado' : 'status-agendado';
+            let statusTexto = a.Status || 'AGENDADO';
+            html+=`<tr>
+                <td>${a.DataAgendamento}</td><td>${a.Hora}</td><td>${a.Tipo}</td><td>${a.Clinica}</td>
+                <td><span class="status-badge ${statusClasse}">${statusTexto}</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="cancelarCompromisso('${a.CPF}', '${a.DataAgendamento}', '${a.Hora}')" ${statusTexto === 'CANCELADO' ? 'disabled' : ''}>X CANCELAR</button></td>
+            </tr>`; 
+        });
         html+=`</tbody></table></div></div>`;
         
         div.innerHTML = html;
         toggleCard('cardFichaCliente', null);
     }
 
-    // --- AGENDA E FINANCEIRO (AÇÕES RAPIDAS) ---
+    // --- AGENDA GERAL ---
     function carregarAgendaGeral() {
         document.getElementById('loader').style.display = 'flex';
         const s = document.createElement('script'); s.src = `${SCRIPT_URL}?action=listar_agenda&callback=renderAgenda`; document.body.appendChild(s);
@@ -562,12 +648,19 @@
         const tb = document.querySelector('#tabelaAgenda tbody'); tb.innerHTML = "";
         if(res.status === "success") {
             res.data.reverse().forEach(a => {
-                tb.innerHTML += `<tr><td><strong>${a.DataAgendamento}</strong></td><td>${a.Hora}</td><td>${a.Tipo}</td><td>${a.Nome}</td><td>${a.CPF}</td><td>${a.Clinica}</td><td>${a.Responsavel}</td></tr>`;
+                let statusClasse = a.Status === 'CANCELADO' ? 'status-cancelado' : 'status-agendado';
+                let statusTexto = a.Status || 'AGENDADO';
+                tb.innerHTML += `<tr>
+                    <td><strong>${a.DataAgendamento}</strong></td><td>${a.Hora}</td><td>${a.Tipo}</td><td>${a.Nome}</td><td>${a.CPF}</td><td>${a.Clinica}</td>
+                    <td><span class="status-badge ${statusClasse}">${statusTexto}</span></td>
+                    <td><button class="btn btn-danger btn-sm" onclick="cancelarCompromisso('${a.CPF}', '${a.DataAgendamento}', '${a.Hora}')" ${statusTexto === 'CANCELADO' ? 'disabled' : ''}>X CANCELAR</button></td>
+                </tr>`;
             });
         }
     }
 
     function abrirModalAgenda(cpf, nome) { document.getElementById('modalAgenda').style.display='flex'; document.getElementById('agCpf').value=cpf; document.getElementById('agNome').value=nome; }
+    
     function salvarAgendamento() {
         if(!document.getElementById('agData').value) return alert("A data é campo obrigatório!");
         document.getElementById('loader').style.display='flex';
@@ -575,16 +668,88 @@
         fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(p)}).then(()=>{ alert("Compromisso Agendado!"); fecharModal('modalAgenda'); carregarAgendaGeral(); document.getElementById('loader').style.display='none'; });
     }
 
+    function cancelarCompromisso(cpf, dataAg, hora) {
+        if(!confirm("Tem a certeza de que deseja cancelar este agendamento? Ficará riscado no sistema.")) return;
+        document.getElementById('loader').style.display='flex';
+        const p = { action: 'agenda_cancelar', cpf: cpf, dataAgendamento: dataAg, hora: hora };
+        fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(p)}).then(()=>{ 
+            alert("Agendamento Cancelado."); 
+            document.getElementById('loader').style.display='none';
+            if(document.getElementById('cardFichaCliente').classList.contains('active')) abrirFicha(cpf); else carregarAgendaGeral();
+        });
+    }
+
+    // --- NOVO MÓDULO FINANCEIRO (CALCULOS DE RECEITAS E DESPESAS) ---
+    function abrirModalFin(cpf, nome, natureza) {
+        document.getElementById('modalFinanceiro').style.display='flex';
+        document.getElementById('finCpf').value=cpf;
+        document.getElementById('finNome').value=nome;
+        alterarNaturezaFin(natureza);
+    }
+
+    function alterarNaturezaFin(natureza) {
+        document.getElementById('finNatureza').value = natureza;
+        if(natureza === 'RECEITA') {
+            document.getElementById('blocoReceita').style.display = 'block';
+            document.getElementById('blocoDespesa').style.display = 'none';
+            document.getElementById('btnSalvarFin').className = 'btn btn-success';
+        } else {
+            document.getElementById('blocoReceita').style.display = 'none';
+            document.getElementById('blocoDespesa').style.display = 'block';
+            document.getElementById('btnSalvarFin').className = 'btn btn-danger';
+        }
+    }
+
     function calcularHon() {
-        const b = parseFloat(document.getElementById('finValorBruto').value) || 0;
-        const p = parseFloat(document.getElementById('finPerc').value) || 0;
-        document.getElementById('finValorHonorario').value = (b * p / 100).toFixed(2);
+        if(document.getElementById('finNatureza').value !== 'RECEITA') return;
+        let b = parseFloat(document.getElementById('finValorBruto').value) || 0;
+        let p = parseFloat(document.getElementById('finPerc').value) || 0;
+        let d = parseFloat(document.getElementById('finDesconto').value) || 0;
+        
+        let calc = (b * p / 100);
+        let final = calc - d;
+        
+        document.getElementById('finValorHonorario').value = calc.toFixed(2);
+        document.getElementById('finValorFinalRec').value = final.toFixed(2);
     }
     
     function salvarFinanceiro() {
         document.getElementById('loader').style.display='flex';
-        const p = { action:'financeiro_lancar', responsavel:document.getElementById('selectUsuario').value, nome:document.getElementById('finNome').value, cpf:document.getElementById('finCpf').value, beneficio:document.getElementById('finBeneficio').value, tipoValor:document.getElementById('finTipoValor').value, valorBaseRecebido:document.getElementById('finValorBruto').value, percentualHonorario:document.getElementById('finPerc').value, valorHonorarioCalculado:document.getElementById('finValorHonorario').value, statusPagamento:document.getElementById('finStatus').value };
-        fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(p)}).then(()=>{ alert("Registro de repasse concluído!"); fecharModal('modalFinanceiro'); abrirFicha(p.cpf); });
+        
+        const nat = document.getElementById('finNatureza').value;
+        let p = {
+            action: 'financeiro_lancar',
+            responsavel: document.getElementById('selectUsuario').value,
+            nome: document.getElementById('finNome').value,
+            cpf: document.getElementById('finCpf').value,
+            natureza: nat,
+            statusPagamento: document.getElementById('finStatus').value,
+            observacao: document.getElementById('finObs').value
+        };
+
+        if(nat === 'RECEITA') {
+            p.beneficio = document.getElementById('finBeneficio').value;
+            p.categoria = document.getElementById('finCatReceita').value;
+            p.valorBruto = document.getElementById('finValorBruto').value;
+            p.percentualHonorario = document.getElementById('finPerc').value;
+            p.valorCalculado = document.getElementById('finValorHonorario').value;
+            p.desconto = document.getElementById('finDesconto').value;
+            p.valorFinal = document.getElementById('finValorFinalRec').value;
+        } else {
+            p.beneficio = "-";
+            p.categoria = document.getElementById('finCatDespesa').value;
+            p.valorBruto = 0;
+            p.percentualHonorario = 0;
+            p.valorCalculado = 0;
+            p.desconto = 0;
+            p.valorFinal = document.getElementById('finValorFinalDes').value;
+        }
+
+        fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(p)}).then(()=>{ 
+            alert("Registo financeiro concluído!"); 
+            fecharModal('modalFinanceiro'); 
+            abrirFicha(p.cpf); 
+        });
     }
 </script>
 
