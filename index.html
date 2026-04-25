@@ -128,7 +128,10 @@
                     </div>
                     <div style="padding:15px;">
                         <label>Possui Representante Legal?</label>
-                        <select id="tRep" onchange="id('bRep').style.display=this.value==='SIM'?'block':'none'"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select>
+                        <select id="tRep" onchange="document.getElementById('bRep').style.display = this.value === 'SIM' ? 'block' : 'none'">
+                            <option value="NÃO">NÃO</option>
+                            <option value="SIM">SIM</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -144,7 +147,7 @@
 
                 <div style="background:#f1f5f9; padding:20px; border-radius:6px; border:1px solid var(--b); margin:20px 0;">
                     <label style="font-size:0.9rem; color:var(--p);">FASE ATUAL DO PROCESSO</label>
-                    <select id="fase" style="font-weight:bold; font-size:1rem;" onchange="id('bJud').style.display=(this.value.includes('JUDICIAL')||this.value.includes('SENTENÇA'))?'block':'none'">
+                    <select id="fase" style="font-weight:bold; font-size:1rem;" onchange="document.getElementById('bJud').style.display = (this.value.includes('JUDICIAL') || this.value.includes('SENTENÇA')) ? 'block' : 'none'">
                         <option value="TRIAGEM / ANÁLISE">TRIAGEM / ANÁLISE</option>
                         <option value="CONTRATO ASSINADO">CONTRATO ASSINADO</option>
                         <option value="AGUARDANDO DOCUMENTOS">AGUARDANDO DOCUMENTOS</option>
@@ -195,7 +198,7 @@
                 <button type="button" class="btn btn-p btn-sm" onclick="addB()">+ ADICIONAR REGRA DE BENEFÍCIO</button>
 
                 <div class="grid-2" style="margin-top:25px; border-top:1px dashed var(--b); padding-top:20px;">
-                    <div><label>Forma de Assinatura do Contrato</label><select id="fAssin" onchange="id('sRogo').disabled=(this.value==='D4SIGN'); if(this.value==='D4SIGN') id('sRogo').value='NÃO';"><option value="MANUAL">MANUAL / FÍSICA</option><option value="D4SIGN">DIGITAL - D4SIGN</option></select></div>
+                    <div><label>Forma de Assinatura do Contrato</label><select id="fAssin" onchange="document.getElementById('sRogo').disabled = (this.value === 'D4SIGN'); if(this.value === 'D4SIGN') document.getElementById('sRogo').value = 'NÃO';"><option value="MANUAL">MANUAL / FÍSICA</option><option value="D4SIGN">DIGITAL - D4SIGN</option></select></div>
                     <div><label>Assinatura a Rogo? (Analfabetos/Impossibilitados)</label><select id="sRogo"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select></div>
                 </div>
 
@@ -362,7 +365,7 @@
     }
 
     // ==========================================
-    // MÓDULO 1: ENGENHARIA DE BENEFÍCIOS
+    // MÓDULO 1: ENGENHARIA DE BENEFÍCIOS E REGRAS DINÂMICAS
     // ==========================================
     window.onload = () => addB("BENEFÍCIO POR INCAPACIDADE");
 
@@ -397,7 +400,10 @@
             </div>
             <div style="margin-top:10px; border-top:1px dashed #cbd5e1; padding-top:10px;">
                 <label style="color:var(--a);">Prever Conversão para Permanente?</label>
-                <select class="cv" onchange="id('dcv_${i}').style.display=this.value==='SIM'?'grid':'none'"><option value="NÃO" ${cv==='NÃO'?'selected':''}>NÃO</option><option value="SIM" ${cv==='SIM'?'selected':''}>SIM</option></select>
+                <select class="cv" onchange="document.getElementById('dcv_${i}').style.display = this.value === 'SIM' ? 'grid' : 'none'">
+                    <option value="NÃO" ${cv==='NÃO'?'selected':''}>NÃO</option>
+                    <option value="SIM" ${cv==='SIM'?'selected':''}>SIM</option>
+                </select>
             </div>
             <div class="grid-2" id="dcv_${i}" style="display:${cv==='SIM'?'grid':'none'}; background:#fffbeb; padding:10px; margin-top:10px; border-radius:4px;">
                 <div><label>% Conv. Permanente</label><input type="number" class="pCv" value="${d?.pCv||45}"></div>
@@ -454,19 +460,19 @@
     }
 
     // ==========================================
-    // MÓDULO 3: BUSCA E EDIÇÃO
+    // MÓDULO 3: BUSCA E EDIÇÃO RIGOROSA
     // ==========================================
     function loadCli() { load(); let s = document.createElement('script'); s.src = URL + "?action=listar_clientes&callback=drawC"; document.body.appendChild(s); }
     function drawC(r) {
         unload(); db = r.data || []; let t = id('tCli').querySelector('tbody'); t.innerHTML = "";
         db.reverse().forEach(c => {
-            t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.FaseProcesso)}">${c.FaseProcesso}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`;
+            t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.StatusProcesso || c.FaseProcesso)}">${c.StatusProcesso || c.FaseProcesso}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`;
         });
     }
     function busca() {
         let q = id('q').value.toUpperCase(); let f = db.filter(x => x.Nome.includes(q) || x.CPF.includes(q));
         let t = id('tCli').querySelector('tbody'); t.innerHTML = "";
-        f.forEach(c => { t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.FaseProcesso)}">${c.FaseProcesso}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`; });
+        f.forEach(c => { t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.StatusProcesso || c.FaseProcesso)}">${c.StatusProcesso || c.FaseProcesso}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`; });
     }
 
     function editar(cpf) {
@@ -474,11 +480,19 @@
         tab('cad', document.querySelectorAll('.btn-m')[0]); window.scrollTo(0,0);
         
         id('nome').value=c.Nome; id('cpf').value=c.CPF; id('nasc').value=fmtUS(c.DataNascimento); id('zap').value=c.WhatsApp; id('nac').value=c.Nacionalidade; id('estCiv').value=c.EstadoCivil; id('end').value=c.Endereco; id('uf').value=c.UF; id('gov').value=c.AcessoGOV;
-        id('fase').value=c.StatusProcesso || c.FaseProcesso || "TRIAGEM / ANÁLISE"; id('bJud').style.display=(id('fase').value.includes('JUDICIAL')||id('fase').value.includes('SENTENÇA'))?'block':'none';
+        id('fase').value=c.StatusProcesso || c.FaseProcesso || "TRIAGEM / ANÁLISE"; document.getElementById('bJud').style.display=(id('fase').value.includes('JUDICIAL')||id('fase').value.includes('SENTENÇA'))?'block':'none';
         
         id('orig').value=c.OrigemCliente||""; id('trab').value=c.EstaTrabalhando||"NÃO"; id('qSeg').value=c.QualidadeSegurado||"SIM"; id('esp').value=c.EspecialidadeMedica||"OUTRA"; id('pLau').value=c.PossuiLaudo||"SIM"; id('tLau').value=c.TempoLaudo||"PERMANENTE";
         id('fAssin').value=c.FormaAssinatura||"MANUAL"; id('sRogo').value=c.AssinaturaARogo||"NÃO";
         
+        // CORREÇÃO: Preencher Dados do Representante na Edição
+        id('tRep').value = c.TemRepresentante || "NÃO";
+        document.getElementById('bRep').style.display = id('tRep').value === 'SIM' ? 'block' : 'none';
+        id('rNom').value = c.RepNome || "";
+        id('rCpf').value = c.RepCPF || "";
+        id('rRg').value = c.RepRG || "";
+        id('rPar').value = c.RepParentesco || "";
+
         // Reconstruir Benefícios rigorosamente
         id('bens').innerHTML = ""; 
         try { let h = JSON.parse(c.HonorariosJSON); for(let k in h) addB(k, h[k]); } catch(e) { addB(); }
@@ -497,11 +511,13 @@
         // DRE
         let tR=0, tD=0;
         r.financeiro.forEach(f => {
-            if(f.StatusPagamento === "PAGO") {
+            if(f.StatusPagamento === "PAGO" || f.StatusPagamento === "EFETIVADO / PAGO") {
                 let v = parseFloat(String(f.ValorFinal).replace(',','.')) || 0;
                 if(f.Natureza === "RECEITA") tR += v; else tD += v;
             }
         });
+
+        let faseAt = c.StatusProcesso || c.FaseProcesso || '-';
 
         let h = `<div class="card-header" style="display:flex; justify-content:space-between; background:var(--p); color:#fff;">
             FICHA: ${c.Nome}
@@ -511,7 +527,7 @@
             <div class="grid-3" style="margin-bottom:20px;">
                 <div><span class="help-text">CPF</span><strong style="font-size:1.1rem;">${c.CPF}</strong></div>
                 <div><span class="help-text">Senha Meu INSS</span><strong style="color:var(--a); font-size:1.1rem;">${c.AcessoGOV||'-'}</strong></div>
-                <div><span class="help-text">Fase do Processo</span><span class="badge ${getBdg(c.FaseProcesso)}" style="font-size:0.9rem;">${c.FaseProcesso||'-'}</span></div>
+                <div><span class="help-text">Fase do Processo</span><span class="badge ${getBdg(faseAt)}" style="font-size:0.9rem;">${faseAt}</span></div>
             </div>
             
             <div style="margin-bottom:25px;">
@@ -528,7 +544,7 @@
             <button class="btn btn-s btn-sm" onclick="abrirFin('${c.CPF}', '${c.Nome}')" style="margin-bottom:15px;">💰 LANÇAR RECEITA OU DESPESA</button>
             <div class="table-responsive" style="margin-bottom:25px;"><table><thead><tr><th>DATA</th><th>NATUREZA</th><th>CATEGORIA</th><th>VLR FINAL</th><th>STATUS</th></tr></thead><tbody>`;
             if(r.financeiro.length===0) h+=`<tr><td colspan="5">Sem lançamentos.</td></tr>`;
-            else r.financeiro.forEach(f => h+=`<tr><td>${f.DataRegistro.split(' ')[0]}</td><td><strong style="color:${f.Natureza==='RECEITA'?'green':'red'}">${f.Natureza}</strong></td><td>${f.Categoria}</td><td>R$ ${f.ValorFinal}</td><td><span class="badge ${f.StatusPagamento==='PAGO'?'b-green':'b-red'}">${f.StatusPagamento}</span></td></tr>`);
+            else r.financeiro.forEach(f => h+=`<tr><td>${f.DataRegistro.split(' ')[0]}</td><td><strong style="color:${f.Natureza==='RECEITA'?'green':'red'}">${f.Natureza}</strong></td><td>${f.Categoria}</td><td>R$ ${f.ValorFinal}</td><td><span class="badge ${getBdg(f.StatusPagamento)}">${f.StatusPagamento}</span></td></tr>`);
         h+=`</tbody></table></div>
 
             <h3 style="color:var(--s); border-bottom:1px solid var(--b); padding-bottom:5px;">AGENDA / PERÍCIAS</h3>
