@@ -1,289 +1,190 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRC Advocacia CRM</title>
-    <style>
-        :root { --p:#1a365d; --s:#2b6cb0; --a:#2f855a; --d:#dc2626; --w:#d97706; --bg:#f1f5f9; --c:#fff; --b:#e2e8f0; --t:#334155; }
-        * { box-sizing: border-box; font-family: sans-serif; }
-        body { background: var(--bg); color: var(--t); margin: 0; }
-        header { background: var(--p); color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .btn-m { background: var(--c); border: 1px solid var(--b); padding: 15px; text-align: center; cursor: pointer; font-weight: bold; color: var(--s); border-radius: 6px; }
-        .btn-m.act { background: var(--s); color: #fff; }
-        .card { background: var(--c); border-radius: 8px; border: 1px solid var(--b); margin-bottom: 20px; display: none; padding: 25px; }
-        .card.act { display: block; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #fff; }
-        .btn-s { background: var(--a); } .btn-p { background: var(--s); } .btn-d { background: var(--d); } .btn-w { background: var(--w); }
-        .ben-box { border-left: 5px solid var(--s); background: #f8fafc; padding: 15px; border: 1px solid var(--b); margin-bottom: 10px; border-radius: 6px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-        th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--b); }
-        th { background: #f8fafc; }
-        .badge { padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #fff; }
-        .loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 1000; justify-content: center; align-items: center; font-weight: bold; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 500; justify-content: center; align-items: center; }
-        .modal-c { background: #fff; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; }
-    </style>
+<meta charset="UTF-8">
+<title>CRM Previdenciário BRC</title>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 20px;
+  background: #f5f5f5;
+}
+
+.container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+input, select, button {
+  padding: 8px;
+  margin: 5px;
+  width: 100%;
+}
+
+button {
+  cursor: pointer;
+}
+
+.beneficio {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.result {
+  background: #eee;
+  padding: 10px;
+  margin-top: 10px;
+}
+</style>
 </head>
+
 <body>
 
-<div id="L" class="loader">CONECTANDO AO SISTEMA BRC...</div>
-
-<header>
-    <div style="font-weight: bold;">BRC ADVOCACIA</div>
-    <select id="user" style="width: auto; background: none; color: #fff; border: 1px solid #fff; padding: 5px;"><option value="BRUNO">Dr. BRUNO</option><option value="PATRICIA">PATRICIA</option></select>
-</header>
-
 <div class="container">
-    <div class="menu">
-        <div class="btn-m act" onclick="tab('cad',this)">CADASTRO / EDIÇÃO</div>
-        <div class="btn-m" onclick="tab('bus',this)">CLIENTES</div>
-        <div class="btn-m" onclick="tab('pan',this)">AGENDA & PRAZOS</div>
-    </div>
 
-    <div id="cad" class="card act">
-        <form id="fCad" onsubmit="return false;">
-            <div class="grid">
-                <div><label>Nome Completo</label><input type="text" id="nome" required style="text-transform: uppercase;"></div>
-                <div><label>CPF</label><input type="text" id="cpf" required oninput="mCPF(this)"></div>
-            </div>
-            <div class="grid">
-                <div><label>Nascimento</label><input type="date" id="nasc"></div>
-                <div><label>WhatsApp</label><input type="text" id="zap"></div>
-                <div><label>Fase do Processo</label>
-                    <select id="fase">
-                        <option value="TRIAGEM">TRIAGEM / ANÁLISE</option>
-                        <option value="AGUARDANDO DOCS">AGUARDANDO DOCS</option>
-                        <option value="INSS PROTOCOLADO">INSS PROTOCOLADO</option>
-                        <option value="AGUARDANDO PERÍCIA">AGUARDANDO PERÍCIA</option>
-                        <option value="INDEFERIDO - ADM" style="background:red;color:#fff">INDEFERIDO - ADM</option>
-                        <option value="JUDICIALIZADO">JUDICIALIZADO</option>
-                        <option value="INDEFERIDO - JUD" style="background:red;color:#fff">INDEFERIDO - JUD</option>
-                        <option value="FINALIZADO / CONCEDIDO" style="background:green;color:#fff">FINALIZADO / CONCEDIDO</option>
-                    </select>
-                </div>
-            </div>
-            <div style="background:#f0fdf4; padding:15px; border-radius:6px; margin-bottom:15px; border:1px solid #bbf7d0;">
-                <label style="color:#166534">Estratégia Previdenciária</label>
-                <div class="grid">
-                    <div><label>Origem / Indicação</label><input type="text" id="orig"></div>
-                    <div><label>Especialidade Médica</label><input type="text" id="esp"></div>
-                    <div><label>Trabalhando Atualmente?</label><select id="trab"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select></div>
-                </div>
-            </div>
-            <div class="grid">
-                <div><label>Senha Gov.br (Meu INSS)</label><input type="text" id="gov"></div>
-                <div><label>Tem Representante?</label><select id="tRep" onchange="id('bRep').style.display=this.value==='SIM'?'block':'none'"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select></div>
-            </div>
-            <div id="bRep" style="display:none; background:#fffbeb; padding:15px; border-radius:6px; margin-bottom:15px;">
-                <div class="grid">
-                    <div><label>Nome Rep.</label><input type="text" id="rNom"></div>
-                    <div><label>CPF Rep.</label><input type="text" id="rCpf" oninput="mCPF(this)"></div>
-                    <div><label>Parentesco</label><input type="text" id="rPar"></div>
-                </div>
-            </div>
-            <div class="grid">
-                <div><label>Endereço Completo</label><input type="text" id="end"></div>
-                <div><label>UF</label><input type="text" id="uf" value="MT"></div>
-            </div>
-            <div id="bens"></div>
-            <button class="btn btn-p" onclick="addB()">+ ADICIONAR REGRA CONTRATUAL</button>
-            <div style="text-align:center; margin-top:30px; border-top:1px solid var(--b); padding-top:20px;">
-                <button class="btn btn-w" onclick="save('cadastro_only')">SOMENTE SALVAR</button>
-                <button class="btn btn-s" onclick="save('cadastro_pdf')">SALVAR E GERAR PDF ELITE</button>
-                <button class="btn btn-d" onclick="location.reload()">NOVO CADASTRO</button>
-            </div>
-        </form>
-    </div>
+<h2>CRM PREVIDENCIÁRIO BRC</h2>
 
-    <div id="bus" class="card">
-        <input type="text" id="q" placeholder="Pesquisar por Nome ou CPF..." oninput="busca()" style="margin-bottom:15px;">
-        <table id="tCli"><thead><tr><th>NOME</th><th>CPF</th><th>FASE ATUAL</th><th>AÇÕES</th></tr></thead><tbody></tbody></table>
-    </div>
+<!-- USUÁRIO -->
+<select id="usuario">
+  <option>BRUNO</option>
+  <option>PATRICIA</option>
+  <option>LORRAYNE</option>
+</select>
 
-    <div id="fic" class="card"></div>
+<hr>
 
-    <div id="pan" class="card">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-            <div>
-                <h3>📅 AGENDA E PERÍCIAS</h3>
-                <button class="btn btn-s btn-sm" onclick="modal('mAg')">+ AGENDAR COMPROMISSO</button>
-                <table id="tAg"><thead><tr><th>DATA</th><th>HORA</th><th>CLIENTE</th><th>STATUS</th></tr></thead><tbody></tbody></table>
-            </div>
-            <div>
-                <h3>⏳ PRAZOS E PROVIDÊNCIAS</h3>
-                <button class="btn btn-w btn-sm" onclick="modal('mPr')">+ NOVA TAREFA / PRAZO</button>
-                <table id="tPr"><thead><tr><th>LIMITE</th><th>TAREFA</th><th>STATUS</th></tr></thead><tbody></tbody></table>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- CADASTRO -->
+<h3>Cadastro</h3>
 
-<div id="mAg" class="modal"><div class="modal-c"><h3>REGISTRAR AGENDAMENTO</h3><label>Data</label><input type="date" id="adDt"><label>Hora</label><input type="time" id="adHr" style="margin:5px 0;"><label>CPF do Cliente</label><input type="text" id="adCpf" oninput="mCPF(this)"><label>Nome</label><input type="text" id="adNom" style="margin:5px 0;"><label>Local / Clínica</label><input type="text" id="adLoc"><button class="btn btn-s" style="width:100%; margin-top:15px;" onclick="agReg()">CONFIRMAR</button><button onclick="id('mAg').style.display='none'" style="width:100%; margin-top:5px; background:none; border:none; color:#888; cursor:pointer;">Cancelar</button></div></div>
+<input id="nome" placeholder="Nome Completo">
+<input id="cpf" placeholder="CPF">
+<input id="nascimento" placeholder="Data Nascimento (DD/MM/AAAA)">
+<input id="whatsapp" placeholder="WhatsApp">
 
-<div id="mPr" class="modal"><div class="modal-c"><h3>NOVO PRAZO FATAL</h3><label>Data Limite</label><input type="date" id="pdDt"><label>Tarefa (Ex: Juntar PPP)</label><input type="text" id="pdTar" style="margin:5px 0;"><label>CPF</label><input type="text" id="pdCpf" oninput="mCPF(this)"><label>Nome</label><input type="text" id="pdNom" style="margin:5px 0;"><button class="btn btn-w" style="width:100%; margin-top:15px;" onclick="prReg()">SALVAR PROVIDÊNCIA</button><button onclick="id('mPr').style.display='none'" style="width:100%; margin-top:5px; background:none; border:none; color:#888; cursor:pointer;">Cancelar</button></div></div>
+<select id="estadoCivil">
+  <option>Solteiro(a)</option>
+  <option>Casado(a)</option>
+</select>
 
-<div id="mFin" class="modal">
-    <div class="modal-c">
-        <h3>LANÇAMENTO FINANCEIRO</h3>
-        <div style="display:flex; gap:10px; margin-bottom:10px;"><button class="btn btn-success" style="flex:1" onclick="altFin('RECEITA')">RECEITA</button><button class="btn btn-danger" style="flex:1" onclick="altFin('DESPESA')">DESPESA</button></div>
-        <form id="formFin">
-            <input type="hidden" id="fiNat" value="RECEITA">
-            <label>CPF</label><input type="text" id="fiCpf" readonly style="background:#f1f5f9">
-            <label>Cliente</label><input type="text" id="fiNome" readonly style="background:#f1f5f9; margin-bottom:10px;">
-            
-            <div id="bRec">
-                <label>Benefício</label><input type="text" id="fiBen">
-                <label>Categoria</label><select id="fiCatR"><option value="RETROATIVO TOTAL">RETROATIVO</option><option value="PARCELA MENSAL">PARCELA MENSAL</option><option value="HONORÁRIO INICIAL">HONORÁRIO INICIAL</option></select>
-                <div class="grid" style="margin-top:10px;">
-                    <div><label>Valor Bruto (R$)</label><input type="number" id="fiB" oninput="calcF()"></div>
-                    <div><label>% Contrato</label><input type="number" id="fiP" oninput="calcF()"></div>
-                </div>
-                <div class="grid">
-                    <div><label>Desc. (R$)</label><input type="number" id="fiD" oninput="calcF()" value="0"></div>
-                    <div><label>Líquido BRC (R$)</label><input type="number" id="fiF1" readonly style="background:#fefcbf; font-weight:bold;"></div>
-                </div>
-            </div>
-            
-            <div id="bDes" style="display:none; background:#fef2f2; padding:10px; border-radius:6px; margin-bottom:10px;">
-                <label>Gasto com Cliente</label><select id="fiCatD"><option value="CONSULTA MÉDICA">CONSULTA MÉDICA</option><option value="PERÍCIA">PERÍCIA</option><option value="TRANSPORTE">TRANSPORTE / UBER</option><option value="OUTRO">OUTRO</option></select>
-                <label>Valor Pago (R$)</label><input type="number" id="fiF2">
-            </div>
-            
-            <label>Observação</label><input type="text" id="fiObs">
-            <label>Status</label><select id="fiSt"><option value="PAGO">EFETUADO / PAGO</option><option value="PENDENTE">PENDENTE</option></select>
-            <button type="button" class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="finReg()">SALVAR REGISTRO</button>
-        </form>
-        <button onclick="id('mFin').style.display='none'" style="width:100%; margin-top:5px; background:none; border:none; color:#888; cursor:pointer;">Fechar</button>
-    </div>
+<input id="endereco" placeholder="Endereço">
+<input id="uf" placeholder="UF">
+
+<hr>
+
+<h3>Benefícios</h3>
+
+<div id="beneficios"></div>
+
+<button onclick="addBeneficio()">+ ADICIONAR BENEFÍCIO</button>
+
+<hr>
+
+<button onclick="salvar()">SALVAR CLIENTE</button>
+
+<hr>
+
+<!-- BUSCA -->
+<h3>Buscar Cliente</h3>
+
+<input id="busca" placeholder="Nome ou CPF">
+<button onclick="buscar()">Buscar</button>
+
+<div id="resultado"></div>
+
 </div>
 
 <script>
-    // URL ATUALIZADA DO SEU SCRIPT GOOGLE
-    const URL = "https://script.google.com/macros/s/AKfycbxiJs_TXF-7PVatuhSprt4osrLmwrzsbsZaC7h4Nq0SkaGZsJwYKKLOfZkz1h5m0z_D_A/exec";
-    
-    let db = [];
 
-    function id(x){return document.getElementById(x);}
-    function tab(t,b){document.querySelectorAll('.card').forEach(c=>c.classList.remove('act')); document.querySelectorAll('.btn-m').forEach(x=>x.classList.remove('act')); id(t).classList.add('act'); if(b) b.classList.add('act'); if(t==='bus') loadCli(); if(t==='pan') loadPan();}
-    function mCPF(i){ let v=i.value.replace(/\D/g,""); i.setAttribute("maxlength","14"); if(v.length>3) v=v.replace(/(\d{3})(\d)/,"$1.$2"); if(v.length>6) v=v.replace(/(\d{3})(\d)/,"$1.$2"); if(v.length>9) v=v.replace(/(\d{3})(\d{1,2})$/,"$1-$2"); i.value=v; }
-    function modal(m){id(m).style.display='flex';}
+const API = "https://script.google.com/macros/s/AKfycbwPcSfJ1NK9qZB_LQYOJG1lgnOsGCuZaGH3ktw3NkgAz-18kWyOZfGUF9QhWm-wRzz6Dw/exec";
 
-    // GESTÃO DE BENEFÍCIOS DINÂMICOS
-    function addB(t="BENEFÍCIO POR INCAPACIDADE", d=null){
-        let i = Date.now();
-        let h = `<div class="ben-box" id="b${i}">
-            <select class="tBen" onchange="rendB('${i}',this.value)">
-                <option value="BENEFÍCIO POR INCAPACIDADE" ${t==='BENEFÍCIO POR INCAPACIDADE'?'selected':''}>INCAPACIDADE TEMPORÁRIA</option>
-                <option value="APOSENTADORIA" ${t==='APOSENTADORIA'?'selected':''}>APOSENTADORIA / BPC / OUTROS</option>
-                <option value="SALÁRIO-MATERNIDADE" ${t==='SALÁRIO-MATERNIDADE'?'selected':''}>SALÁRIO MATERNIDADE</option>
-            </select>
-            <div id="c${i}" style="margin-top:10px"></div>
-            <button onclick="id('b${i}').remove()" style="color:red; background:none; border:none; font-size:11px; cursor:pointer;">[X] Remover Regra</button>
-        </div>`;
-        id('bens').insertAdjacentHTML('beforeend', h); rendB(i, t, d);
-    }
+// =========================
+// BENEFÍCIOS DINÂMICOS
+// =========================
+function addBeneficio() {
+  const div = document.createElement("div");
+  div.className = "beneficio";
 
-    function rendB(i, t, d=null){
-        let c = id('c'+i);
-        if(t==="BENEFÍCIO POR INCAPACIDADE"){
-            c.innerHTML = `<div class="grid">
-                <div><label>% Inicial</label><input type="number" class="p1" value="${d?d.p1:30}"></div>
-                <div><label>% Após Manut.</label><input type="number" class="p2" value="${d?d.p2:15}"></div>
-                <div><label>Conv. Perm?</label><select class="cv"><option value="NÃO" ${d?.cv==='NÃO'?'selected':''}>NÃO</option><option value="SIM" ${d?.cv==='SIM'?'selected':''}>SIM</option></select></div>
-            </div>`;
-        } else {
-            c.innerHTML = `<div class="grid">
-                <div><label>% Retroativo</label><input type="number" class="p1" value="${d?d.p1:45}"></div>
-                <div><label>Qtd. Parcelas</label><input type="number" class="p2" value="${d?d.p2:6}"></div>
-            </div>`;
-        }
-    }
+  div.innerHTML = `
+    <select class="tipo">
+      <option>Benefício por Incapacidade</option>
+      <option>Aposentadoria</option>
+      <option>BPC</option>
+    </select>
 
-    // SALVAMENTO
-    function save(ac){
-        if(!id('nome').value || !id('cpf').value) return alert("Nome e CPF são obrigatórios!");
-        id('L').style.display='flex';
-        let b = [], h = {};
-        document.querySelectorAll('.ben-box').forEach(x=>{
-            let t = x.querySelector('.tBen').value; b.push(t);
-            h[t] = {p1:x.querySelector('.p1').value, p2:x.querySelector('.p2').value, cv:x.querySelector('.cv')?.value};
-        });
-        let p = {action:ac, resp:id('user').value, nome:id('nome').value, cpf:id('cpf').value, nasc:id('nasc').value.split('-').reverse().join('/'), zap:id('zap').value, fase:id('fase').value, gov:id('gov').value, end:id('end').value, uf:id('uf').value, temRep:id('tRep').value, repNome:id('rNom').value, repCpf:id('rCpf').value, repPar:id('rPar').value, orig:id('orig').value, esp:id('esp').value, trab:id('trab').value, bens:b, hons:h};
-        fetch(URL,{method:'POST',mode:'no-cors',body:JSON.stringify(p)}).then(()=>{alert("Dados processados com sucesso!"); id('L').style.display='none'; if(ac!=='cadastro_pdf') location.reload();});
-    }
+    <input class="percentual" placeholder="% Honorários">
+  `;
 
-    // LISTAGEM
-    function loadCli(){ id('L').style.display='flex'; let s=document.createElement('script'); s.src=URL+"?action=listar_clientes&callback=drawC"; document.body.appendChild(s); }
-    function drawC(r){
-        id('L').style.display='none'; db=r.data; let t=id('tCli').querySelector('tbody'); t.innerHTML="";
-        if(!r.data) return;
-        r.data.forEach(c=>{ t.innerHTML+=`<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td>${c.Fase}</td><td><button onclick="ficha('${c.CPF}')">ABRIR FICHA</button></td></tr>`; });
-    }
-    function busca(){ let q=id('q').value.toUpperCase(); let f=db.filter(x=>x.Nome.includes(q)||x.CPF.includes(q)); let t=id('tCli').querySelector('tbody'); t.innerHTML=""; f.forEach(c=>{ t.innerHTML+=`<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td>${c.Fase}</td><td><button onclick="ficha('${c.CPF}')">ABRIR FICHA</button></td></tr>`; }); }
+  document.getElementById("beneficios").appendChild(div);
+}
 
-    // FICHA CRM
-    function ficha(cpf){ id('L').style.display='flex'; let s=document.createElement('script'); s.src=URL+"?action=carregar_ficha&cpf="+cpf+"&callback=drawF"; document.body.appendChild(s); }
-    function drawF(r){
-        id('L').style.display='none'; if(r.status!=="success") return;
-        let c=r.cliente; tab('fic',null);
-        let tR=0, tD=0; r.financeiro.forEach(f=>{ if(f.Status==='PAGO'){ let v=parseFloat(f.Final)||0; if(f.Nat==='RECEITA') tR+=v; else tD+=v; } });
-        
-        let h = `<div style="border-bottom: 2px solid var(--p); padding-bottom:10px; margin-bottom:20px;">
-            <h2 style="margin:0; color:var(--p);">${c.Nome}</h2>
-            <p style="margin:5px 0;">CPF: ${c.CPF} | Fase: <strong>${c.Fase}</strong> | Senha Gov: <strong>${c.Gov||'-'}</strong></p>
-        </div>
-        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:20px;">
-            <div style="background:var(--accent); color:#fff; padding:15px; border-radius:6px; text-align:center;"><small>HONORÁRIOS</small><br><strong>R$ ${tR.toFixed(2)}</strong></div>
-            <div style="background:var(--danger); color:#fff; padding:15px; border-radius:6px; text-align:center;"><small>DESPESAS</small><br><strong>R$ ${tD.toFixed(2)}</strong></div>
-            <div style="background:var(--p); color:#fff; padding:15px; border-radius:6px; text-align:center;"><small>LUCRO LÍQUIDO</small><br><strong>R$ ${(tR-tD).toFixed(2)}</strong></div>
-        </div>
-        <div style="margin-bottom:20px;">
-            <a href="${c.LnkPDF}" target="_blank" class="btn btn-p">📄 VER CONTRATO</a>
-            <button class="btn btn-w" onclick="editar('${c.CPF}')">✏️ EDITAR CADASTRO</button>
-            <button class="btn btn-success" onclick="abrirFin('${c.CPF}','${c.Nome}')">💰 LANÇAR FINANCEIRO</button>
-        </div>
-        <h3>HISTÓRICO DE AGENDAMENTOS</h3><table><thead><tr><th>DATA</th><th>HORA</th><th>STATUS</th><th>AÇÃO</th></tr></thead><tbody>`;
-        r.agenda.forEach(a=>{ h+=`<tr><td>${a.DataAg}</td><td>${a.Hora}</td><td>${a.Status}</td><td><button onclick="cancAg('${c.CPF}','${a.DataAg}','${a.Hora}')">CANCELAR</button></td></tr>`; });
-        h+=`</tbody></table><h3>PROVIDÊNCIAS DO CASO</h3><table><thead><tr><th>LIMITE</th><th>TAREFA</th><th>STATUS</th><th>AÇÃO</th></tr></thead><tbody>`;
-        r.providencias.forEach(p=>{ h+=`<tr><td>${p.Limite}</td><td>${p.Tarefa}</td><td>${p.Status}</td><td><button onclick="cumpPr('${c.CPF}','${p.Tarefa}','${p.Limite}')">CONCLUIR</button></td></tr>`; });
-        h+=`</tbody></table>`;
-        id('fic').innerHTML=h;
-    }
+// =========================
+// SALVAR CLIENTE
+// =========================
+function salvar() {
 
-    // EDIÇÃO
-    function editar(cpf){
-        let c = db.find(x=>x.CPF===cpf); tab('cad',null);
-        id('nome').value=c.Nome; id('cpf').value=c.CPF; id('zap').value=c.Zap; id('fase').value=c.Fase; id('gov').value=c.Gov; id('end').value=c.End; id('uf').value=c.UF;
-        id('orig').value=c.Orig; id('esp').value=c.Esp; id('trab').value=c.Trab;
-        id('bens').innerHTML=""; try{ let h=JSON.parse(c.HonJSON); for(let k in h) addB(k,h[k]); }catch(e){addB();}
-    }
+  const beneficios = [];
+  document.querySelectorAll(".beneficio").forEach(b => {
+    beneficios.push({
+      tipo: b.querySelector(".tipo").value,
+      percentual: b.querySelector(".percentual").value
+    });
+  });
 
-    // PAINEL GERAL
-    function loadPan(){ id('L').style.display='flex'; let s=document.createElement('script'); s.src=URL+"?action=listar_painel&callback=drawP"; document.body.appendChild(s); }
-    function drawP(r){
-        id('L').style.display='none';
-        let ta=id('tAg').querySelector('tbody'); ta.innerHTML=""; if(r.agenda) r.agenda.reverse().forEach(a=>{ ta.innerHTML+=`<tr><td>${a.DataAg}</td><td>${a.Hora}</td><td>${a.Nome}</td><td>${a.Status}</td></tr>`; });
-        let tp=id('tPr').querySelector('tbody'); tp.innerHTML=""; if(r.providencias) r.providencias.reverse().forEach(p=>{ tp.innerHTML+=`<tr><td>${p.Limite}</td><td>${p.Tarefa}</td><td>${p.Status}</td></tr>`; });
-    }
+  if (beneficios.length === 0) {
+    alert("Adicione pelo menos um benefício");
+    return;
+  }
 
-    // REGISTROS RÁPIDOS
-    function agReg(){ id('L').style.display='flex'; let p={action:'agenda_create', dataAg:id('adDt').value.split('-').reverse().join('/'), hora:id('adHr').value, nome:id('adNom').value, cpf:id('adCpf').value, local:id('adLoc').value, resp:id('user').value}; fetch(URL,{method:'POST',mode:'no-cors',body:JSON.stringify(p)}).then(()=>{alert("Agendamento Registrado!"); location.reload();}); }
-    function prReg(){ id('L').style.display='flex'; let p={action:'providencia_create', limite:id('pdDt').value.split('-').reverse().join('/'), tarefa:id('pdTar').value, nome:id('pdNom').value, cpf:id('pdCpf').value, resp:id('user').value}; fetch(URL,{method:'POST',mode:'no-cors',body:JSON.stringify(p)}).then(()=>{alert("Providência Registrada!"); location.reload();}); }
+  const payload = {
+    action: "salvarCliente",
+    nome: document.getElementById("nome").value,
+    cpf: document.getElementById("cpf").value,
+    nascimento: document.getElementById("nascimento").value,
+    whatsapp: document.getElementById("whatsapp").value,
+    estadoCivil: document.getElementById("estadoCivil").value,
+    endereco: document.getElementById("endereco").value,
+    uf: document.getElementById("uf").value,
+    beneficios: beneficios,
+    responsavel: document.getElementById("usuario").value
+  };
 
-    function cancAg(cpf, dt, hr){ if(!confirm("Deseja realmente cancelar este agendamento?"))return; id('L').style.display='flex'; fetch(URL,{method:'POST',mode:'no-cors',body:JSON.stringify({action:'agenda_cancelar', cpf:cpf, dataAg:dt, hora:hr})}).then(()=>{alert("Cancelado!"); location.reload();}); }
-    function cumpPr(cpf, tar, dt){ if(!confirm("Confirmar conclusão desta tarefa?"))return; id('L').style.display='flex'; fetch(URL,{method:'POST',mode:'no-cors',body:JSON.stringify({action:'providencia_cumprir', cpf:cpf, tarefa:tar, limite:dt})}).then(()=>{alert("Concluído!"); location.reload();}); }
+  fetch(API, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify(payload)
+  });
 
-    // FINANCEIRO
-    function abrirFin(cpf, nome){ id('fiCpf').value=cpf; id('fiNome').value=nome; modal('mFin'); }
-    function altFin(n){ id('fiNat').value=n; if(n==='RECEITA'){ id('bRec').style.display='block'; id('bDes').style.display='none'; }else{ id('bRec').style.display='none'; id('bDes').style.display='block'; } }
-    function calcF(){ let b=parseFloat(id('fiB').value)||0; let p=parseFloat(id('fiP').value)||0; let d=parseFloat(id('fiD').value)||0; let c=(b*p/100); id('fiF1').value=(c-d).toFixed(2); }
-    function finReg(){ id('L').style.display='flex'; let p={action:'financeiro_lancar', resp:id('user').value, nome:id('fiNome').value, cpf:id('fiCpf').value, nat:id('fiNat').value, cat:id('fiNat').value==='RECEITA'?id('fiCatR').value:id('fiCatD').value, ben:id('fiBen').value, bruto:id('fiB').value, perc:id('fiP').value, calc:id('fiNat').value==='RECEITA'?id('fiF1').value:0, desc:id('fiD').value, final:id('fiNat').value==='RECEITA'?id('fiF1').value:id('fiF2').value, status:id('fiSt').value, obs:id('fiObs').value}; fetch(URL,{method:'POST',mode:'no-cors',body:JSON.stringify(p)}).then(()=>{alert("Financeiro Lançado!"); location.reload();}); }
+  alert("Cliente salvo com sucesso");
+}
+
+// =========================
+// BUSCAR CLIENTE (JSONP)
+// =========================
+function buscar() {
+  const q = document.getElementById("busca").value;
+
+  const script = document.createElement("script");
+  script.src = API + "?action=buscar&q=" + q + "&callback=render";
+  document.body.appendChild(script);
+}
+
+function render(data) {
+  const div = document.getElementById("resultado");
+  div.innerHTML = "";
+
+  data.forEach(c => {
+    const el = document.createElement("div");
+    el.className = "result";
+    el.innerHTML = c.nome + " - " + c.cpf + " - " + c.status;
+    div.appendChild(el);
+  });
+}
+
 </script>
 
 </body>
