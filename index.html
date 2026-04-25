@@ -1,190 +1,596 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>CRM Previdenciário BRC</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRC Advocacia - CRM Previdenciário</title>
+    <style>
+        :root { --p:#1a365d; --s:#2b6cb0; --a:#2f855a; --d:#dc2626; --w:#d97706; --bg:#f1f5f9; --c:#fff; --b:#cbd5e1; --t:#334155; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--bg); color: var(--t); margin: 0; font-size: 14px; }
+        
+        header { background: var(--p); color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header-title { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; }
+        select.user-sel { padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.2); color: white; border: none; font-weight: bold; outline: none; }
+        select.user-sel option { color: #333; }
 
-<style>
-body {
-  font-family: Arial;
-  margin: 20px;
-  background: #f5f5f5;
-}
+        .container { max-width: 1250px; margin: 25px auto; padding: 0 15px; }
+        
+        /* Menus */
+        .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 25px; }
+        .btn-m { background: var(--c); border: 2px solid var(--b); border-bottom: 4px solid var(--s); padding: 15px; text-align: center; font-weight: 700; color: var(--s); cursor: pointer; border-radius: 6px; transition: 0.2s; text-transform: uppercase; }
+        .btn-m:hover { transform: translateY(-2px); }
+        .btn-m.act { background: var(--s); color: #fff; border-color: var(--p); border-bottom-color: var(--p); }
 
-.container {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 1200px;
-  margin: auto;
-}
+        /* Cards */
+        .card { background: var(--c); border-radius: 8px; border: 1px solid var(--b); margin-bottom: 20px; display: none; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card.act { display: block; animation: fadeIn 0.3s; }
+        .card-header { background: #f8fafc; color: var(--p); padding: 15px 25px; font-weight: 800; border-bottom: 1px solid var(--b); font-size: 1.1rem; text-transform: uppercase; }
+        .card-body { padding: 25px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-input, select, button {
-  padding: 8px;
-  margin: 5px;
-  width: 100%;
-}
+        /* Forms */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+        
+        label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid var(--b); border-radius: 4px; font-size: 0.95rem; background: #fff; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--s); outline: none; box-shadow: 0 0 0 3px rgba(43,108,176,0.1); }
+        .help-text { font-size: 0.75rem; color: #64748b; margin-top: 4px; display: block; font-style: italic; }
 
-button {
-  cursor: pointer;
-}
+        /* Boxes Especiais */
+        .box-sec { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .box-warn { background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
+        .box-jud { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
+        .ben-box { border: 1px solid var(--s); padding: 20px; border-radius: 6px; background: #f8fafc; margin-bottom: 15px; border-left: 5px solid var(--s); }
 
-.beneficio {
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin-top: 10px;
-}
+        /* Botões */
+        .btn { padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: 0.2s; display: inline-flex; justify-content: center; align-items: center; }
+        .btn-s { background: var(--a); color: white; } .btn-p { background: var(--s); color: white; } .btn-d { background: var(--d); color: white; } .btn-w { background: var(--w); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+        .btn:hover { filter: brightness(110%); }
 
-.result {
-  background: #eee;
-  padding: 10px;
-  margin-top: 10px;
-}
-</style>
+        /* Tabelas */
+        .table-responsive { overflow-x: auto; border: 1px solid var(--b); border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: #fff; white-space: nowrap; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--b); }
+        th { background: #f1f5f9; font-weight: 700; color: #475569; text-transform: uppercase; }
+        tr:hover td { background: #f8fafc; }
+
+        /* Badges e DRE */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .b-green { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+        .b-red { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+        .b-blue { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+        .b-yellow { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .b-strike { text-decoration: line-through; background: #f1f5f9; color: #64748b; }
+
+        .dre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .dre-card { padding: 20px; border-radius: 6px; color: white; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .dre-card h4 { margin: 0 0 5px 0; font-size: 0.8rem; text-transform: uppercase; opacity: 0.9; }
+        .dre-card h2 { margin: 0; font-size: 1.5rem; }
+
+        /* Modais */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-c { background: #fff; padding: 30px; border-radius: 8px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .modal-c h3 { margin-top: 0; color: var(--p); border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
+        .loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 3000; justify-content: center; align-items: center; flex-direction: column; font-weight: 800; color: var(--p); font-size: 1.2rem; }
+        .spinner { width: 50px; height: 50px; border: 5px solid var(--b); border-top: 5px solid var(--s); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-
 <body>
 
+<div id="L" class="loader"><div class="spinner"></div>A SINCRONIZAR BRC...</div>
+
+<header>
+    <div class="header-title">BRC ADVOCACIA | <span style="font-weight:400; font-size:0.9rem;">CRM Previdenciário</span></div>
+    <select id="user" class="user-sel">
+        <option value="BRUNO">Dr. BRUNO</option>
+        <option value="PATRICIA">PATRICIA</option>
+        <option value="LORRAYNE">LORRAYNE</option>
+    </select>
+</header>
+
 <div class="container">
+    <div class="menu">
+        <div class="btn-m act" onclick="tab('cad',this)">NOVO CLIENTE / EDIÇÃO</div>
+        <div class="btn-m" onclick="tab('bus',this)">BASE DE CLIENTES</div>
+        <div class="btn-m" onclick="tab('pan',this)">PAINEL DE COMANDO</div>
+    </div>
 
-<h2>CRM PREVIDENCIÁRIO BRC</h2>
+    <div id="cad" class="card act">
+        <div class="card-header">FICHA DE ATENDIMENTO E CONTRATO</div>
+        <div class="card-body">
+            <form id="fCad" onsubmit="return false;" autocomplete="off">
+                <div class="grid-2">
+                    <div><label>Nome Completo *</label><input type="text" id="nome" required style="text-transform: uppercase;"></div>
+                    <div><label>CPF *</label><input type="text" id="cpf" required oninput="mCPF(this)" onblur="validarCPFReal(this)">
+                         <span id="cpfAlert" style="color:var(--d); font-size:0.75rem; font-weight:bold; display:none;">CPF INVÁLIDO!</span></div>
+                </div>
+                <div class="grid-4">
+                    <div><label>Nascimento *</label><input type="date" id="nasc" required></div>
+                    <div><label>WhatsApp</label><input type="text" id="zap"></div>
+                    <div><label>Nacionalidade</label><input type="text" id="nac" value="BRASILEIRA" style="text-transform: uppercase;"></div>
+                    <div><label>Estado Civil</label><select id="estCiv"><option value="SOLTEIRO(A)">SOLTEIRO(A)</option><option value="CASADO(A)">CASADO(A)</option><option value="DIVORCIADO(A)">DIVORCIADO(A)</option><option value="VIÚVO(A)">VIÚVO(A)</option><option value="UNIÃO ESTÁVEL">UNIÃO ESTÁVEL</option></select></div>
+                </div>
+                <div class="grid-2">
+                    <div><label>Endereço Completo</label><input type="text" id="end" style="text-transform: uppercase;"></div>
+                    <div><label>UF</label><input type="text" id="uf" value="MT" style="text-transform: uppercase;"></div>
+                </div>
 
-<!-- USUÁRIO -->
-<select id="usuario">
-  <option>BRUNO</option>
-  <option>PATRICIA</option>
-  <option>LORRAYNE</option>
-</select>
+                <div class="grid-2" style="margin-top:20px;">
+                    <div style="background:#e0f2fe; padding:15px; border-radius:6px; border:1px solid #bae6fd;">
+                        <label style="color:#0369a1;">Senha Meu INSS (Acesso Gov.br) *</label>
+                        <input type="text" id="gov" style="border-color:#7dd3fc;" required>
+                    </div>
+                    <div style="padding:15px;">
+                        <label>Possui Representante Legal?</label>
+                        <select id="tRep" onchange="id('bRep').style.display=this.value==='SIM'?'block':'none'"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select>
+                    </div>
+                </div>
+                
+                <div id="bRep" class="box-warn">
+                    <h4 style="margin:0 0 10px 0; color:var(--w);">DADOS DO REPRESENTANTE (Menores / Incapazes)</h4>
+                    <div class="grid-4">
+                        <div><label>Nome</label><input type="text" id="rNom" style="text-transform: uppercase;" autocomplete="new-password"></div>
+                        <div><label>CPF</label><input type="text" id="rCpf" oninput="mCPF(this)" autocomplete="new-password"></div>
+                        <div><label>RG</label><input type="text" id="rRg" autocomplete="new-password"></div>
+                        <div><label>Parentesco</label><input type="text" id="rPar" style="text-transform: uppercase;" autocomplete="new-password"></div>
+                    </div>
+                </div>
 
-<hr>
+                <div style="background:#f1f5f9; padding:20px; border-radius:6px; border:1px solid var(--b); margin:20px 0;">
+                    <label style="font-size:0.9rem; color:var(--p);">FASE ATUAL DO PROCESSO</label>
+                    <select id="fase" style="font-weight:bold; font-size:1rem;" onchange="id('bJud').style.display=(this.value.includes('JUDICIAL')||this.value.includes('SENTENÇA'))?'block':'none'">
+                        <option value="TRIAGEM / ANÁLISE">TRIAGEM / ANÁLISE</option>
+                        <option value="CONTRATO ASSINADO">CONTRATO ASSINADO</option>
+                        <option value="AGUARDANDO DOCUMENTOS">AGUARDANDO DOCUMENTOS</option>
+                        <option value="REQUERIMENTO INSS PROTOCOLADO">REQUERIMENTO INSS PROTOCOLADO</option>
+                        <option value="NOVO BENEFÍCIO SOLICITADO">NOVO BENEFÍCIO SOLICITADO</option>
+                        <option value="PRORROGAÇÃO PROTOCOLADA">PRORROGAÇÃO PROTOCOLADA</option>
+                        <option value="EXIGÊNCIA INSS">EXIGÊNCIA INSS</option>
+                        <option value="AGUARDANDO PERÍCIA">AGUARDANDO PERÍCIA</option>
+                        <option value="AGUARDANDO RESULTADO PERÍCIA">AGUARDANDO RESULTADO PERÍCIA</option>
+                        <option value="BENEFÍCIO CONCEDIDO">BENEFÍCIO CONCEDIDO (VITÓRIA)</option>
+                        <option value="INDEFERIDO - FASE ADMINISTRATIVA">INDEFERIDO - FASE ADMINISTRATIVA</option>
+                        <option value="RECURSO ADMINISTRATIVO">RECURSO ADMINISTRATIVO</option>
+                        <option value="JUDICIALIZADO">JUDICIALIZADO</option>
+                        <option value="INDEFERIDO - FASE JUDICIAL">INDEFERIDO - FASE JUDICIAL</option>
+                        <option value="SENTENÇA">SENTENÇA</option>
+                        <option value="CUMPRIMENTO DE SENTENÇA">CUMPRIMENTO DE SENTENÇA</option>
+                        <option value="BENEFÍCIO ENCERRADO">BENEFÍCIO ENCERRADO</option>
+                        <option value="ARQUIVADO">ARQUIVADO</option>
+                    </select>
 
-<!-- CADASTRO -->
-<h3>Cadastro</h3>
+                    <div id="bJud" class="box-jud" style="margin-top:15px;">
+                        <h4 style="margin:0 0 10px 0; color:#1e40af;">INFORMAÇÕES DO PROCESSO JUDICIAL</h4>
+                        <div class="grid-4">
+                            <div><label>Nº Processo</label><input type="text" id="jNum"></div>
+                            <div><label>Ajuizamento</label><input type="date" id="jDt"></div>
+                            <div><label>Vara / Juízo</label><input type="text" id="jVara" style="text-transform: uppercase;"></div>
+                            <div><label>Situação</label><select id="jSit"><option value="AÇÃO AJUIZADA">AÇÃO AJUIZADA</option><option value="AGUARDANDO CITAÇÃO">AGUARDANDO CITAÇÃO</option><option value="PERÍCIA DESIGNADA">PERÍCIA DESIGNADA</option><option value="AGUARDANDO SENTENÇA">AGUARDANDO SENTENÇA</option><option value="PROCEDENTE">PROCEDENTE</option><option value="IMPROCEDENTE">IMPROCEDENTE</option><option value="RECURSO">RECURSO</option></select></div>
+                        </div>
+                    </div>
+                </div>
 
-<input id="nome" placeholder="Nome Completo">
-<input id="cpf" placeholder="CPF">
-<input id="nascimento" placeholder="Data Nascimento (DD/MM/AAAA)">
-<input id="whatsapp" placeholder="WhatsApp">
+                <div class="box-sec">
+                    <label style="color:#166534; font-size:0.9rem; margin-bottom:10px;">ESTRATÉGIA PREVIDENCIÁRIA (Complemento)</label>
+                    <div class="grid-4">
+                        <div><label>Origem / Indicação</label><input type="text" id="orig" style="text-transform: uppercase;"></div>
+                        <div><label>Trabalhando?</label><select id="trab"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select></div>
+                        <div><label>Qualidade Segurado</label><select id="qSeg"><option value="SIM">SIM</option><option value="NÃO">NÃO</option><option value="PERÍODO DE GRAÇA">PERÍODO DE GRAÇA</option></select></div>
+                        <div><label>Especialidade Médica</label><select id="esp"><option value="ORTOPÉDICA">ORTOPÉDICA</option><option value="PSIQUIÁTRICA">PSIQUIÁTRICA</option><option value="NEUROLÓGICA">NEUROLÓGICA</option><option value="ONCOLÓGICA">ONCOLÓGICA</option><option value="AUTOIMUNE">AUTOIMUNE</option><option value="OUTRA">OUTRA</option></select></div>
+                    </div>
+                    <div class="grid-2">
+                        <div><label>Possui Laudo Atualizado?</label><select id="pLau"><option value="SIM">SIM</option><option value="NÃO">NÃO</option></select></div>
+                        <div><label>Validade do Laudo</label><select id="tLau"><option value="PERMANENTE">PERMANENTE</option><option value="30 DIAS">30 DIAS</option><option value="60 DIAS">60 DIAS</option><option value="90 DIAS">90 DIAS</option><option value="180 DIAS">180 DIAS</option><option value="OUTRO">OUTRO</option></select></div>
+                    </div>
+                </div>
 
-<select id="estadoCivil">
-  <option>Solteiro(a)</option>
-  <option>Casado(a)</option>
-</select>
+                <div class="card-header" style="background:#e2e8f0; margin: 30px 0 15px; border-radius: 4px;">ENGENHARIA DE HONORÁRIOS E CONTRATO</div>
+                <div id="bens"></div>
+                <button type="button" class="btn btn-p btn-sm" onclick="addB()">+ ADICIONAR REGRA DE BENEFÍCIO</button>
 
-<input id="endereco" placeholder="Endereço">
-<input id="uf" placeholder="UF">
+                <div class="grid-2" style="margin-top:25px; border-top:1px dashed var(--b); padding-top:20px;">
+                    <div><label>Forma de Assinatura do Contrato</label><select id="fAssin" onchange="id('sRogo').disabled=(this.value==='D4SIGN'); if(this.value==='D4SIGN') id('sRogo').value='NÃO';"><option value="MANUAL">MANUAL / FÍSICA</option><option value="D4SIGN">DIGITAL - D4SIGN</option></select></div>
+                    <div><label>Assinatura a Rogo? (Analfabetos/Impossibilitados)</label><select id="sRogo"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select></div>
+                </div>
 
-<hr>
+                <div style="margin-top: 40px; text-align: center; background: #f8fafc; padding: 25px; border-radius: 6px; border:1px solid var(--b);">
+                    <button type="button" class="btn btn-w" onclick="preSave('cadastro_only')">SOMENTE CADASTRAR</button>
+                    <button type="button" class="btn btn-s" onclick="preSave('cadastro_pdf')" style="margin: 0 10px;">CADASTRAR E GERAR PDF ELITE</button>
+                    <button type="button" class="btn btn-p" id="btnReg" style="display:none; margin: 0 10px;" onclick="preSave('regerar_documento')">ATUALIZAR E REGERAR PDF</button>
+                    <button type="button" class="btn btn-d" onclick="location.reload()" style="margin-left:10px;">NOVO CADASTRO (LIMPAR)</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<h3>Benefícios</h3>
+    <div id="bus" class="card">
+        <div class="card-header">BASE GERAL DE CLIENTES</div>
+        <div class="card-body">
+            <input type="text" id="q" placeholder="Pesquisar por Nome ou CPF..." oninput="busca()" style="margin-bottom:20px; font-size:1.1rem; padding:12px;">
+            <div class="table-responsive">
+                <table id="tCli"><thead><tr><th>CLIENTE</th><th>CPF</th><th>FASE ATUAL</th><th>AÇÕES</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+    </div>
 
-<div id="beneficios"></div>
+    <div id="fic" class="card"></div>
 
-<button onclick="addBeneficio()">+ ADICIONAR BENEFÍCIO</button>
-
-<hr>
-
-<button onclick="salvar()">SALVAR CLIENTE</button>
-
-<hr>
-
-<!-- BUSCA -->
-<h3>Buscar Cliente</h3>
-
-<input id="busca" placeholder="Nome ou CPF">
-<button onclick="buscar()">Buscar</button>
-
-<div id="resultado"></div>
-
+    <div id="pan" class="card">
+        <div class="card-header" style="display:flex; justify-content:space-between;">
+            PAINEL DE COMANDO E PRAZOS
+            <button class="btn btn-p btn-sm" onclick="loadPan()">🔄 ATUALIZAR PAINEL</button>
+        </div>
+        <div class="card-body">
+            <div class="grid-2" style="gap:25px;">
+                <div>
+                    <h3 style="color:var(--s); margin-top:0; border-bottom:2px solid var(--b); padding-bottom:10px;">📅 AGENDA E PERÍCIAS</h3>
+                    <button class="btn btn-s btn-sm" onclick="modal('mAg')" style="margin-bottom:15px; width:100%;">+ NOVO COMPROMISSO</button>
+                    <div class="table-responsive"><table id="tAg"><thead><tr><th>DATA/HORA</th><th>CLIENTE/LOCAL</th><th>STATUS</th></tr></thead><tbody></tbody></table></div>
+                </div>
+                <div>
+                    <h3 style="color:var(--d); margin-top:0; border-bottom:2px solid var(--b); padding-bottom:10px;">⏳ PRAZOS FATAIS (EXIGÊNCIAS)</h3>
+                    <button class="btn btn-w btn-sm" onclick="modal('mPr')" style="margin-bottom:15px; width:100%;">+ CADASTRAR TAREFA</button>
+                    <div class="table-responsive"><table id="tPr"><thead><tr><th>LIMITE</th><th>TAREFA/CLIENTE</th><th>AÇÃO</th></tr></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<div id="mConf" class="modal"><div class="modal-c">
+    <h3>CONFIRMAR DADOS DO CONTRATO</h3>
+    <div id="txtConf" style="line-height:1.6; margin-bottom:20px;"></div>
+    <div class="grid-2">
+        <button class="btn btn-s" id="btnConfSave">✔ CONFIRMAR E SALVAR</button>
+        <button class="btn btn-d" onclick="fecharModal('mConf')">X CANCELAR</button>
+    </div>
+</div></div>
+
+<div id="mAg" class="modal"><div class="modal-c">
+    <h3>REGISTRAR COMPROMISSO</h3>
+    <div class="grid-2"><div><label>Data</label><input type="date" id="adDt"></div><div><label>Hora</label><input type="time" id="adHr"></div></div>
+    <div class="grid-2"><div><label>Tipo</label><select id="adTip"><option>PERÍCIA INSS</option><option>PERÍCIA JUDICIAL</option><option>CONSULTA MÉDICA</option><option>ATENDIMENTO ESCRITÓRIO</option></select></div><div><label>Local/Clínica</label><input type="text" id="adLoc" style="text-transform:uppercase;"></div></div>
+    <div class="grid-2"><div><label>CPF</label><input type="text" id="adCpf" oninput="mCPF(this)"></div><div><label>Nome do Cliente</label><input type="text" id="adNom" style="text-transform:uppercase;"></div></div>
+    <button class="btn btn-s" style="width:100%; margin-top:15px;" onclick="agReg()">SALVAR NA AGENDA</button>
+    <button onclick="fecharModal('mAg')" style="width:100%; margin-top:10px; background:none; border:none; cursor:pointer;">Cancelar</button>
+</div></div>
+
+<div id="mPr" class="modal"><div class="modal-c">
+    <h3 style="color:var(--d);">NOVO PRAZO FATAL</h3>
+    <label>Data Limite Exata</label><input type="date" id="pdDt" style="margin-bottom:15px;">
+    <label>Descrição da Tarefa / Exigência</label><input type="text" id="pdTar" style="text-transform:uppercase; margin-bottom:15px;" placeholder="Ex: JUNTAR PPP, FAZER RECURSO">
+    <div class="grid-2"><div><label>CPF</label><input type="text" id="pdCpf" oninput="mCPF(this)"></div><div><label>Nome do Cliente</label><input type="text" id="pdNom" style="text-transform:uppercase;"></div></div>
+    <button class="btn btn-w" style="width:100%; margin-top:15px;" onclick="prReg()">REGISTRAR TAREFA</button>
+    <button onclick="fecharModal('mPr')" style="width:100%; margin-top:10px; background:none; border:none; cursor:pointer;">Cancelar</button>
+</div></div>
+
+<div id="mFin" class="modal"><div class="modal-c" style="max-width:700px;">
+    <h3>LANÇAMENTO FINANCEIRO (DRE)</h3>
+    <div class="grid-2" style="margin-bottom:15px;">
+        <button class="btn btn-s" onclick="altFin('RECEITA')">💰 ENTRADA (HONORÁRIO)</button>
+        <button class="btn btn-d" onclick="altFin('DESPESA')">📉 SAÍDA (CUSTOS)</button>
+    </div>
+    <input type="hidden" id="fiNat" value="RECEITA">
+    <div class="grid-2"><div><label>CPF</label><input type="text" id="fiCpf" readonly style="background:var(--bg)"></div><div><label>Cliente</label><input type="text" id="fiNome" readonly style="background:var(--bg)"></div></div>
+    
+    <div id="bRec">
+        <div class="grid-2"><div><label>Benefício Referência</label><input type="text" id="fiBen" style="text-transform:uppercase;"></div><div><label>Categoria da Receita</label><select id="fiCatR"><option>RETROATIVO TOTAL</option><option>PARCELA MENSAL</option><option>PAGAMENTO ÚNICO</option><option>CONVERSÃO PERMANENTE</option></select></div></div>
+        <div class="grid-4" style="align-items:end;">
+            <div><label>Vlr. Bruto (R$)</label><input type="number" id="fiB" oninput="calcF()"></div>
+            <div><label>% Contrato</label><input type="number" id="fiP" oninput="calcF()"></div>
+            <div><label>Desconto (R$)</label><input type="number" id="fiD" oninput="calcF()" value="0"></div>
+            <div><label>LÍQUIDO (R$)</label><input type="number" id="fiF1" readonly style="background:#fefcbf; font-weight:800; color:#92400e;"></div>
+        </div>
+    </div>
+    
+    <div id="bDes" style="display:none; background:#fef2f2; padding:15px; border-radius:6px; margin:15px 0;">
+        <div class="grid-2"><div><label>Categoria do Gasto</label><select id="fiCatD"><option>CONSULTA MÉDICA</option><option>PERÍCIA PARTICULAR</option><option>TRANSPORTE / UBER</option><option>TAXAS / CUSTAS</option><option>OUTRO</option></select></div><div><label>Valor Pago (R$)</label><input type="number" id="fiF2" style="border-color:var(--d);"></div></div>
+    </div>
+    
+    <div class="grid-2" style="margin-top:15px;"><div><label>Observação</label><input type="text" id="fiObs"></div><div><label>Status do Lançamento</label><select id="fiSt"><option value="PAGO">EFETIVADO / PAGO</option><option value="PENDENTE">PENDENTE</option></select></div></div>
+    <button class="btn btn-p" style="width:100%; margin-top:20px;" onclick="finReg()">GRAVAR NO DRE</button>
+    <button onclick="fecharModal('mFin')" style="width:100%; margin-top:10px; background:none; border:none; cursor:pointer;">Fechar</button>
+</div></div>
+
 <script>
+    // ==========================================
+    // URL DO SEU BACKEND (APPS SCRIPT)
+    // ==========================================
+    const URL = "https://script.google.com/macros/s/AKfycbyvBcIo4t56IvY6fLDai4UGJEUlit4wHMlexkNEGZWtAIBqrVW_7LJHeO7EZDSZcDG8aw/exec";
+    
+    let db = []; // Armazena clientes para busca rápida
 
-const API = "https://script.google.com/macros/s/AKfycbwPcSfJ1NK9qZB_LQYOJG1lgnOsGCuZaGH3ktw3NkgAz-18kWyOZfGUF9QhWm-wRzz6Dw/exec";
+    // Utilitários Básicos
+    function id(x) { return document.getElementById(x); }
+    function fecharModal(m) { id(m).style.display = 'none'; }
+    function modal(m) { id(m).style.display = 'flex'; }
+    function load() { id('L').style.display = 'flex'; }
+    function unload() { id('L').style.display = 'none'; }
+    
+    // Navegação de Abas
+    function tab(t, b) {
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('act'));
+        document.querySelectorAll('.btn-m').forEach(x => x.classList.remove('act'));
+        id(t).classList.add('act'); if(b) b.classList.add('act');
+        if(t === 'bus') loadCli();
+        if(t === 'pan') loadPan();
+    }
 
-// =========================
-// BENEFÍCIOS DINÂMICOS
-// =========================
-function addBeneficio() {
-  const div = document.createElement("div");
-  div.className = "beneficio";
+    // Validação e Máscara de CPF
+    function mCPF(i) {
+        let v = i.value.replace(/\D/g, ""); i.setAttribute("maxlength", "14");
+        if(v.length > 3) v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        if(v.length > 6) v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        if(v.length > 9) v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        i.value = v;
+    }
+    
+    let cpfValido = false;
+    function validarCPFReal(i) {
+        let cpf = i.value.replace(/[^\d]+/g, '');
+        id('cpfAlert').style.display = 'none'; cpfValido = false;
+        if(cpf.length === 0) return;
+        if(cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) { id('cpfAlert').style.display = 'block'; return; }
+        let soma = 0, resto;
+        for (let j = 1; j <= 9; j++) soma += parseInt(cpf.substring(j-1, j)) * (11 - j);
+        resto = (soma * 10) % 11; if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.substring(9, 10))) { id('cpfAlert').style.display = 'block'; return; }
+        soma = 0; for (let j = 1; j <= 10; j++) soma += parseInt(cpf.substring(j-1, j)) * (12 - j);
+        resto = (soma * 10) % 11; if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.substring(10, 11))) { id('cpfAlert').style.display = 'block'; return; }
+        cpfValido = true;
+    }
 
-  div.innerHTML = `
-    <select class="tipo">
-      <option>Benefício por Incapacidade</option>
-      <option>Aposentadoria</option>
-      <option>BPC</option>
-    </select>
+    // Formatação de Datas
+    function fmtBR(d) { if(!d) return ""; let p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
+    function fmtUS(d) { if(!d || !d.includes('/')) return ""; let p = d.split('/'); return `${p[2]}-${p[1]}-${p[0]}`; }
 
-    <input class="percentual" placeholder="% Honorários">
-  `;
+    // Badges de Status Dinâmicos
+    function getBdg(s) {
+        if(!s) return "b-yellow"; s = s.toUpperCase();
+        if(s.includes("INDEFERIDO") || s.includes("IMPROCEDENTE")) return "b-red";
+        if(s.includes("CONCEDIDO") || s.includes("CUMPRIDO") || s.includes("PROCEDENTE")) return "b-green";
+        if(s.includes("NOVO") || s.includes("PRORROGAÇÃO")) return "b-blue";
+        if(s.includes("CANCELADO")) return "b-strike";
+        return "b-yellow";
+    }
 
-  document.getElementById("beneficios").appendChild(div);
-}
+    // ==========================================
+    // MÓDULO 1: ENGENHARIA DE BENEFÍCIOS
+    // ==========================================
+    window.onload = () => addB("BENEFÍCIO POR INCAPACIDADE");
 
-// =========================
-// SALVAR CLIENTE
-// =========================
-function salvar() {
+    function addB(t="BENEFÍCIO POR INCAPACIDADE", d=null) {
+        let i = "b_" + Date.now() + Math.floor(Math.random()*1000);
+        let h = `<div class="ben-box" id="${i}">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <select class="tBen" onchange="rendB('${i}',this.value)" style="width:70%; font-weight:bold; color:var(--p);">
+                    <option value="BENEFÍCIO POR INCAPACIDADE" ${t==='BENEFÍCIO POR INCAPACIDADE'?'selected':''}>INCAPACIDADE TEMPORÁRIA</option>
+                    <option value="APOSENTADORIA" ${t==='APOSENTADORIA'?'selected':''}>APOSENTADORIA</option>
+                    <option value="BPC" ${t==='BPC'?'selected':''}>BPC (LOAS)</option>
+                    <option value="SALÁRIO-MATERNIDADE" ${t==='SALÁRIO-MATERNIDADE'?'selected':''}>SALÁRIO MATERNIDADE</option>
+                    <option value="AUXÍLIO-ACIDENTE" ${t==='AUXÍLIO-ACIDENTE'?'selected':''}>AUXÍLIO-ACIDENTE</option>
+                    <option value="PENSÃO POR MORTE" ${t==='PENSÃO POR MORTE'?'selected':''}>PENSÃO POR MORTE</option>
+                </select>
+                <button type="button" class="btn btn-d btn-sm" onclick="id('${i}').remove()">X REMOVER</button>
+            </div>
+            <div id="c_${i}" style="background:#fff; padding:15px; border-radius:4px; border:1px solid var(--b);"></div>
+        </div>`;
+        id('bens').insertAdjacentHTML('beforeend', h);
+        rendB(i, t, d);
+    }
 
-  const beneficios = [];
-  document.querySelectorAll(".beneficio").forEach(b => {
-    beneficios.push({
-      tipo: b.querySelector(".tipo").value,
-      percentual: b.querySelector(".percentual").value
-    });
-  });
+    function rendB(i, t, d=null) {
+        let c = id('c_'+i);
+        if(t === "BENEFÍCIO POR INCAPACIDADE") {
+            let cv = d?.cv || "NÃO";
+            c.innerHTML = `<div class="grid-3">
+                <div><label>% Inicial</label><input type="number" class="pIni" value="${d?.pIni||30}"></div>
+                <div><label>Nº Parcelas (Iniciais)</label><input type="number" class="paIni" value="${d?.paIni||8}"></div>
+                <div><label>% Após Manutenção</label><input type="number" class="pApo" value="${d?.pApo||15}"></div>
+            </div>
+            <div style="margin-top:10px; border-top:1px dashed #cbd5e1; padding-top:10px;">
+                <label style="color:var(--a);">Prever Conversão para Permanente?</label>
+                <select class="cv" onchange="id('dcv_${i}').style.display=this.value==='SIM'?'grid':'none'"><option value="NÃO" ${cv==='NÃO'?'selected':''}>NÃO</option><option value="SIM" ${cv==='SIM'?'selected':''}>SIM</option></select>
+            </div>
+            <div class="grid-2" id="dcv_${i}" style="display:${cv==='SIM'?'grid':'none'}; background:#fffbeb; padding:10px; margin-top:10px; border-radius:4px;">
+                <div><label>% Conv. Permanente</label><input type="number" class="pCv" value="${d?.pCv||45}"></div>
+                <div><label>Nº Parc. Integrais (Conv)</label><input type="number" class="paCv" value="${d?.paCv||6}"></div>
+            </div>`;
+        } else if (t === "SALÁRIO-MATERNIDADE") {
+            c.innerHTML = `<div class="grid-2"><div><label>% Total Honorários</label><input type="number" class="pTot" value="${d?.pTot||30}"></div><div><label>Nº Parcelas</label><input type="number" class="paTot" value="${d?.paTot||4}" readonly style="background:#f1f5f9;"></div></div>`;
+        } else {
+            c.innerHTML = `<div class="grid-2"><div><label>% Sobre Retroativo</label><input type="number" class="pRet" value="${d?.pRet||45}"></div><div><label>Nº Parc. Integrais</label><input type="number" class="pInt" value="${d?.pInt||6}"></div></div>`;
+        }
+    }
 
-  if (beneficios.length === 0) {
-    alert("Adicione pelo menos um benefício");
-    return;
-  }
+    // ==========================================
+    // MÓDULO 2: SALVAMENTO E PDF
+    // ==========================================
+    let acaoAtual = "";
+    function preSave(ac) {
+        if(!id('nome').value || !id('cpf').value || !id('nasc').value || !id('gov').value) return alert("Preencha todos os campos obrigatórios (*).");
+        validarCPFReal(id('cpf')); if(!cpfValido) return alert("O CPF informado é inválido!");
+        if(document.querySelectorAll('.ben-box').length === 0) return alert("Adicione pelo menos 1 regra de benefício!");
+        
+        acaoAtual = ac;
+        let bensHTML = "";
+        document.querySelectorAll('.ben-box').forEach(x => bensHTML += `<li>${x.querySelector('.tBen').value}</li>`);
+        
+        id('txtConf').innerHTML = `<strong>CLIENTE:</strong> ${id('nome').value.toUpperCase()}<br><strong>CPF:</strong> ${id('cpf').value}<br><strong>BENEFÍCIOS:</strong><ul>${bensHTML}</ul><br><span style="color:var(--d)">Ação: ${ac === 'cadastro_only' ? 'Apenas gravar na base (Sem PDF)' : 'Gravar e Gerar Contrato/Procuração no Drive'}</span>`;
+        modal('mConf');
+    }
 
-  const payload = {
-    action: "salvarCliente",
-    nome: document.getElementById("nome").value,
-    cpf: document.getElementById("cpf").value,
-    nascimento: document.getElementById("nascimento").value,
-    whatsapp: document.getElementById("whatsapp").value,
-    estadoCivil: document.getElementById("estadoCivil").value,
-    endereco: document.getElementById("endereco").value,
-    uf: document.getElementById("uf").value,
-    beneficios: beneficios,
-    responsavel: document.getElementById("usuario").value
-  };
+    id('btnConfSave').onclick = () => {
+        fecharModal('mConf'); load();
+        
+        let bens = [], hons = {};
+        document.querySelectorAll('.ben-box').forEach(x => {
+            let t = x.querySelector('.tBen').value; bens.push(t);
+            if(t === "BENEFÍCIO POR INCAPACIDADE") hons[t] = {pIni:x.querySelector('.pIni').value, paIni:x.querySelector('.paIni').value, pApo:x.querySelector('.pApo').value, cv:x.querySelector('.cv').value, pCv:x.querySelector('.pCv')?.value, paCv:x.querySelector('.paCv')?.value};
+            else if(t === "SALÁRIO-MATERNIDADE") hons[t] = {pTot:x.querySelector('.pTot').value, paTot:4};
+            else hons[t] = {pRet:x.querySelector('.pRet').value, pInt:x.querySelector('.pInt').value};
+        });
 
-  fetch(API, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(payload)
-  });
+        let p = {
+            action: acaoAtual, resp: id('user').value, nome: id('nome').value, cpf: id('cpf').value, nasc: fmtBR(id('nasc').value), zap: id('zap').value, nac: id('nac').value, estCiv: id('estCiv').value, end: id('end').value, uf: id('uf').value, gov: id('gov').value,
+            temRep: id('tRep').value, repNome: id('rNom').value, repCpf: id('rCpf').value, repRg: id('rRg').value, repPar: id('rPar').value,
+            fase: id('fase').value, origem: id('orig').value, trab: id('trab').value, qSegurado: id('qSeg').value, espMed: id('esp').value, possuiLaudo: id('pLau').value, tempoLaudo: id('tLau').value,
+            formaAssinatura: id('fAssin').value, rogo: id('sRogo').value, bens: bens, hons: hons
+        };
 
-  alert("Cliente salvo com sucesso");
-}
+        fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(p)})
+        .then(() => {
+            alert("Sincronização concluída com sucesso no Sheets e no Drive!");
+            unload();
+            if(acaoAtual !== 'regerar_documento') location.reload();
+        }).catch(() => { alert("Erro de rede. Verifique a conexão."); unload(); });
+    }
 
-// =========================
-// BUSCAR CLIENTE (JSONP)
-// =========================
-function buscar() {
-  const q = document.getElementById("busca").value;
+    // ==========================================
+    // MÓDULO 3: BUSCA E EDIÇÃO
+    // ==========================================
+    function loadCli() { load(); let s = document.createElement('script'); s.src = URL + "?action=listar_clientes&callback=drawC"; document.body.appendChild(s); }
+    function drawC(r) {
+        unload(); db = r.data || []; let t = id('tCli').querySelector('tbody'); t.innerHTML = "";
+        db.reverse().forEach(c => {
+            t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.FaseProcesso)}">${c.FaseProcesso}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`;
+        });
+    }
+    function busca() {
+        let q = id('q').value.toUpperCase(); let f = db.filter(x => x.Nome.includes(q) || x.CPF.includes(q));
+        let t = id('tCli').querySelector('tbody'); t.innerHTML = "";
+        f.forEach(c => { t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.FaseProcesso)}">${c.FaseProcesso}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`; });
+    }
 
-  const script = document.createElement("script");
-  script.src = API + "?action=buscar&q=" + q + "&callback=render";
-  document.body.appendChild(script);
-}
+    function editar(cpf) {
+        let c = db.find(x => x.CPF === cpf); if(!c) return;
+        tab('cad', document.querySelectorAll('.btn-m')[0]); window.scrollTo(0,0);
+        
+        id('nome').value=c.Nome; id('cpf').value=c.CPF; id('nasc').value=fmtUS(c.DataNascimento); id('zap').value=c.WhatsApp; id('nac').value=c.Nacionalidade; id('estCiv').value=c.EstadoCivil; id('end').value=c.Endereco; id('uf').value=c.UF; id('gov').value=c.AcessoGOV;
+        id('fase').value=c.StatusProcesso || c.FaseProcesso || "TRIAGEM / ANÁLISE"; id('bJud').style.display=(id('fase').value.includes('JUDICIAL')||id('fase').value.includes('SENTENÇA'))?'block':'none';
+        
+        id('orig').value=c.OrigemCliente||""; id('trab').value=c.EstaTrabalhando||"NÃO"; id('qSeg').value=c.QualidadeSegurado||"SIM"; id('esp').value=c.EspecialidadeMedica||"OUTRA"; id('pLau').value=c.PossuiLaudo||"SIM"; id('tLau').value=c.TempoLaudo||"PERMANENTE";
+        id('fAssin').value=c.FormaAssinatura||"MANUAL"; id('sRogo').value=c.AssinaturaARogo||"NÃO";
+        
+        // Reconstruir Benefícios rigorosamente
+        id('bens').innerHTML = ""; 
+        try { let h = JSON.parse(c.HonorariosJSON); for(let k in h) addB(k, h[k]); } catch(e) { addB(); }
+        
+        id('btnReg').style.display = "inline-flex"; cpfValido = true;
+    }
 
-function render(data) {
-  const div = document.getElementById("resultado");
-  div.innerHTML = "";
+    // ==========================================
+    // MÓDULO 4: FICHA CRM E DRE
+    // ==========================================
+    function abrirFicha(cpf) { load(); let s = document.createElement('script'); s.src = URL + "?action=carregar_ficha&cpf=" + cpf + "&callback=drawF"; document.body.appendChild(s); }
+    function drawF(r) {
+        unload(); if(r.status !== "success") return alert("Erro ao carregar cliente.");
+        let c = r.cliente; tab('fic', null);
+        
+        // DRE
+        let tR=0, tD=0;
+        r.financeiro.forEach(f => {
+            if(f.StatusPagamento === "PAGO") {
+                let v = parseFloat(String(f.ValorFinal).replace(',','.')) || 0;
+                if(f.Natureza === "RECEITA") tR += v; else tD += v;
+            }
+        });
 
-  data.forEach(c => {
-    const el = document.createElement("div");
-    el.className = "result";
-    el.innerHTML = c.nome + " - " + c.cpf + " - " + c.status;
-    div.appendChild(el);
-  });
-}
+        let h = `<div class="card-header" style="display:flex; justify-content:space-between; background:var(--p); color:#fff;">
+            FICHA: ${c.Nome}
+            <button class="btn btn-w btn-sm" onclick="editar('${c.CPF}')">✏️ EDITAR CADASTRO</button>
+        </div>
+        <div class="card-body">
+            <div class="grid-3" style="margin-bottom:20px;">
+                <div><span class="help-text">CPF</span><strong style="font-size:1.1rem;">${c.CPF}</strong></div>
+                <div><span class="help-text">Senha Meu INSS</span><strong style="color:var(--a); font-size:1.1rem;">${c.AcessoGOV||'-'}</strong></div>
+                <div><span class="help-text">Fase do Processo</span><span class="badge ${getBdg(c.FaseProcesso)}" style="font-size:0.9rem;">${c.FaseProcesso||'-'}</span></div>
+            </div>
+            
+            <div style="margin-bottom:25px;">
+                ${c.LinkPastaPrincipal ? `<a href="${c.LinkPastaPrincipal}" target="_blank" class="btn btn-p">📂 ABRIR PASTA DO DRIVE</a>` : ''}
+                ${c.LinkPDF ? `<a href="${c.LinkPDF}" target="_blank" class="btn btn-s">📄 VER CONTRATO ASSINADO</a>` : ''}
+            </div>
 
+            <h3 style="color:var(--p); border-bottom:1px solid var(--b); padding-bottom:5px;">RESUMO FINANCEIRO (DRE)</h3>
+            <div class="dre-grid">
+                <div class="dre-card" style="background:var(--a);"><h4>Total Faturado (Honorários)</h4><h2>R$ ${tR.toFixed(2)}</h2></div>
+                <div class="dre-card" style="background:var(--d);"><h4>Custos Escritório (Despesas)</h4><h2>R$ ${tD.toFixed(2)}</h2></div>
+                <div class="dre-card" style="background:var(--p);"><h4>LUCRO LÍQUIDO REAL</h4><h2>R$ ${(tR-tD).toFixed(2)}</h2></div>
+            </div>
+            <button class="btn btn-s btn-sm" onclick="abrirFin('${c.CPF}', '${c.Nome}')" style="margin-bottom:15px;">💰 LANÇAR RECEITA OU DESPESA</button>
+            <div class="table-responsive" style="margin-bottom:25px;"><table><thead><tr><th>DATA</th><th>NATUREZA</th><th>CATEGORIA</th><th>VLR FINAL</th><th>STATUS</th></tr></thead><tbody>`;
+            if(r.financeiro.length===0) h+=`<tr><td colspan="5">Sem lançamentos.</td></tr>`;
+            else r.financeiro.forEach(f => h+=`<tr><td>${f.DataRegistro.split(' ')[0]}</td><td><strong style="color:${f.Natureza==='RECEITA'?'green':'red'}">${f.Natureza}</strong></td><td>${f.Categoria}</td><td>R$ ${f.ValorFinal}</td><td><span class="badge ${f.StatusPagamento==='PAGO'?'b-green':'b-red'}">${f.StatusPagamento}</span></td></tr>`);
+        h+=`</tbody></table></div>
+
+            <h3 style="color:var(--s); border-bottom:1px solid var(--b); padding-bottom:5px;">AGENDA / PERÍCIAS</h3>
+            <div class="table-responsive" style="margin-bottom:25px;"><table><thead><tr><th>DATA</th><th>HORA</th><th>TIPO</th><th>LOCAL</th><th>STATUS</th><th>AÇÃO</th></tr></thead><tbody>`;
+            if(r.agenda.length===0) h+=`<tr><td colspan="6">Sem agenda.</td></tr>`;
+            else r.agenda.forEach(a => { let st=a.Status||'AGENDADO'; h+=`<tr><td>${a.DataAgendamento}</td><td>${a.Hora}</td><td>${a.Tipo}</td><td>${a.Clinica}</td><td><span class="badge ${getBdg(st)}">${st}</span></td><td><button class="btn btn-d btn-sm" onclick="cancAg('${c.CPF}','${a.DataAgendamento}','${a.Hora}')" ${st==='CANCELADO'?'disabled':''}>CANCELAR</button></td></tr>`; });
+        h+=`</tbody></table></div>
+
+            <h3 style="color:var(--d); border-bottom:1px solid var(--b); padding-bottom:5px;">PRAZOS E PROVIDÊNCIAS</h3>
+            <div class="table-responsive"><table><thead><tr><th>LIMITE</th><th>TAREFA</th><th>STATUS</th><th>AÇÃO</th></tr></thead><tbody>`;
+            if(r.providencias.length===0) h+=`<tr><td colspan="4">Sem prazos.</td></tr>`;
+            else r.providencias.forEach(p => { let st=p.Status||'PENDENTE'; h+=`<tr><td>${p.DataLimite}</td><td>${p.Providencia}</td><td><span class="badge ${getBdg(st)}">${st}</span></td><td><button class="btn btn-s btn-sm" onclick="cumpPr('${c.CPF}','${p.Providencia}','${p.DataLimite}')" ${st==='CUMPRIDO'?'disabled':''}>✔ CUMPRIDO</button></td></tr>`; });
+        h+=`</tbody></table></div>
+        </div>`;
+        id('fic').innerHTML = h;
+    }
+
+    // ==========================================
+    // MÓDULO 5: PAINEL, AGENDA E PRAZOS
+    // ==========================================
+    function loadPan() { load(); let s = document.createElement('script'); s.src = URL + "?action=listar_painel&callback=drawP"; document.body.appendChild(s); }
+    function drawP(r) {
+        unload();
+        let ta = id('tAg').querySelector('tbody'); ta.innerHTML = "";
+        if(r.agenda) r.agenda.reverse().forEach(a => { let st=a.Status||'AGENDADO'; ta.innerHTML += `<tr><td><strong>${a.DataAgendamento}</strong><br><span style="font-size:0.75rem">${a.Hora}</span></td><td><strong>${a.Nome}</strong><br><span style="font-size:0.75rem">${a.Clinica} - ${a.Tipo}</span></td><td><span class="badge ${getBdg(st)}">${st}</span><br><button class="btn btn-d btn-sm" style="margin-top:5px;" onclick="cancAg('${a.CPF}','${a.DataAgendamento}','${a.Hora}')" ${st==='CANCELADO'?'disabled':''}>X CANCELAR</button></td></tr>`; });
+        
+        let tp = id('tPr').querySelector('tbody'); tp.innerHTML = "";
+        if(r.providencias) r.providencias.reverse().forEach(p => { let st=p.Status||'PENDENTE'; tp.innerHTML += `<tr><td><strong>${p.DataLimite}</strong></td><td><strong>${p.Nome}</strong><br><span style="font-size:0.75rem">${p.Providencia}</span></td><td><span class="badge ${getBdg(st)}">${st}</span><br><button class="btn btn-s btn-sm" style="margin-top:5px;" onclick="cumpPr('${p.CPF}','${p.Providencia}','${p.DataLimite}')" ${st==='CUMPRIDO'?'disabled':''}>✔ CONCLUÍDO</button></td></tr>`; });
+    }
+
+    function agReg() {
+        if(!id('adDt').value || !id('adCpf').value) return alert("Data e CPF são obrigatórios.");
+        load(); let p = { action: 'agenda_create', resp: id('user').value, dataAg: fmtBR(id('adDt').value), hora: id('adHr').value, tipo: id('adTip').value, nome: id('adNom').value, cpf: id('adCpf').value, local: id('adLoc').value };
+        fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(p)}).then(() => { alert("Compromisso Agendado!"); location.reload(); });
+    }
+    function prReg() {
+        if(!id('pdDt').value || !id('pdCpf').value) return alert("Data Limite e CPF são obrigatórios.");
+        load(); let p = { action: 'providencia_create', resp: id('user').value, limite: fmtBR(id('pdDt').value), tarefa: id('pdTar').value, nome: id('pdNom').value, cpf: id('pdCpf').value };
+        fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(p)}).then(() => { alert("Prazo Registrado com Sucesso!"); location.reload(); });
+    }
+
+    function cancAg(cpf, dt, hr) {
+        if(!confirm("Tem certeza que deseja CANCELAR este agendamento? Ele ficará riscado no sistema.")) return;
+        load(); fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'agenda_cancelar', resp: id('user').value, cpf: cpf, dataAg: dt, hora: hr})}).then(() => { alert("Agendamento Cancelado!"); location.reload(); });
+    }
+    function cumpPr(cpf, tar, dt) {
+        if(!confirm("Confirmar a CONCLUSÃO desta exigência/prazo?")) return;
+        load(); fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'providencia_cumprir', resp: id('user').value, cpf: cpf, tarefa: tar, limite: dt})}).then(() => { alert("Tarefa marcada como cumprida!"); location.reload(); });
+    }
+
+    // ==========================================
+    // MÓDULO 6: FINANCEIRO
+    // ==========================================
+    function abrirFin(cpf, nome) { id('fiCpf').value=cpf; id('fiNome').value=nome; altFin('RECEITA'); modal('mFin'); }
+    function altFin(n) { id('fiNat').value=n; if(n==='RECEITA') { id('bRec').style.display='block'; id('bDes').style.display='none'; } else { id('bRec').style.display='none'; id('bDes').style.display='block'; } }
+    function calcF() { let b=parseFloat(id('fiB').value)||0; let p=parseFloat(id('fiP').value)||0; let d=parseFloat(id('fiD').value)||0; let c=(b*p/100); id('fiF1').value=(c-d).toFixed(2); }
+    
+    function finReg() {
+        load(); let n = id('fiNat').value;
+        let p = { action: 'financeiro_lancar', resp: id('user').value, nome: id('fiNome').value, cpf: id('fiCpf').value, nat: n, cat: n==='RECEITA'?id('fiCatR').value:id('fiCatD').value, ben: id('fiBen').value, bruto: id('fiB').value||0, perc: id('fiP').value||0, calc: n==='RECEITA'?id('fiF1').value:0, desc: id('fiD').value||0, final: n==='RECEITA'?id('fiF1').value:id('fiF2').value, status: id('fiSt').value, obs: id('fiObs').value };
+        fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(p)}).then(() => { alert("Lançamento Registrado no DRE!"); location.reload(); });
+    }
 </script>
 
 </body>
