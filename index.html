@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BRC Advocacia - CRM Previdenciário</title>
+    
     <style>
         :root { --p:#1a365d; --s:#2b6cb0; --a:#2f855a; --d:#dc2626; --w:#d97706; --bg:#f1f5f9; --c:#fff; --b:#cbd5e1; --t:#334155; }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: var(--bg); color: var(--t); margin: 0; font-size: 14px; }
         
+        /* Cabeçalho */
         header { background: var(--p); color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .header-title { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; }
         select.user-sel { padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.2); color: white; border: none; font-weight: bold; outline: none; }
@@ -16,19 +18,20 @@
 
         .container { max-width: 1250px; margin: 25px auto; padding: 0 15px; }
         
-        /* Menus e Cards */
+        /* Menus */
         .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 25px; }
         .btn-m { background: var(--c); border: 2px solid var(--b); border-bottom: 4px solid var(--s); padding: 15px; text-align: center; font-weight: 700; color: var(--s); cursor: pointer; border-radius: 6px; transition: 0.2s; text-transform: uppercase; }
         .btn-m:hover { transform: translateY(-2px); }
         .btn-m.act { background: var(--s); color: #fff; border-color: var(--p); border-bottom-color: var(--p); }
 
+        /* Cards e Painéis */
         .card { background: var(--c); border-radius: 8px; border: 1px solid var(--b); margin-bottom: 20px; display: none; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .card.act { display: block; animation: fadeIn 0.3s; }
         .card-header { background: #f8fafc; color: var(--p); padding: 15px 25px; font-weight: 800; border-bottom: 1px solid var(--b); font-size: 1.1rem; text-transform: uppercase; }
         .card-body { padding: 25px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Formulários e Grids */
+        /* Formulários */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
@@ -39,19 +42,19 @@
         input:focus, select:focus { border-color: var(--s); outline: none; box-shadow: 0 0 0 3px rgba(43,108,176,0.1); }
         .help-text { font-size: 0.75rem; color: #64748b; margin-top: 4px; display: block; font-style: italic; }
 
-        /* Caixas Dinâmicas */
+        /* Caixas Dinâmicas e Destaques */
         .box-sec { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
         .box-warn { background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
         .box-jud { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
         .ben-box { border: 1px solid var(--s); padding: 20px; border-radius: 6px; background: #f8fafc; margin-bottom: 15px; border-left: 5px solid var(--s); }
 
-        /* Botões */
+        /* Botões Globais */
         .btn { padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: 0.2s; display: inline-flex; justify-content: center; align-items: center; }
         .btn-s { background: var(--a); color: white; } .btn-p { background: var(--s); color: white; } .btn-d { background: var(--d); color: white; } .btn-w { background: var(--w); color: white; }
         .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
         .btn:hover { filter: brightness(110%); }
 
-        /* Tabelas e Badges */
+        /* Tabelas Responsivas e Badges (Status) */
         .table-responsive { overflow-x: auto; border: 1px solid var(--b); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: #fff; white-space: nowrap; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--b); }
@@ -75,7 +78,7 @@
         .modal-c { background: #fff; padding: 30px; border-radius: 8px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
         .modal-c h3 { margin-top: 0; color: var(--p); border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
         
-        /* Loading */
+        /* Tela de Carregamento (Loading) */
         .loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 3000; justify-content: center; align-items: center; flex-direction: column; font-weight: 800; color: var(--p); font-size: 1.2rem; }
         .spinner { width: 50px; height: 50px; border: 5px solid var(--b); border-top: 5px solid var(--s); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -244,9 +247,7 @@
             </div>
         </div>
     </div>
-</div>
-
-<div id="mConf" class="modal"><div class="modal-c">
+</div> <div id="mConf" class="modal"><div class="modal-c">
     <h3>CONFIRMAR DADOS DO CONTRATO</h3>
     <div id="txtConf" style="line-height:1.6; margin-bottom:20px;"></div>
     <div class="grid-2">
@@ -301,12 +302,9 @@
     <button onclick="fecharModal('mFin')" style="width:100%; margin-top:10px; background:none; border:none; cursor:pointer;">Fechar</button>
 </div></div>
 <script>
-    // ==========================================
-    // ETAPA 5: O MOTOR VISUAL (JavaScript)
-    // ==========================================
     const URL = "https://script.google.com/macros/s/AKfycbwSS_fVEjz3znQ--8gFV1KvetUQHyfpzfGPLWOjg2HkfgWtOPSwBIz71UxRyx-tyZhsLA/exec";
     
-    let db = []; // Armazena clientes para busca rápida
+    let db = []; 
 
     // Utilitários Básicos
     function id(x) { return document.getElementById(x); }
@@ -315,7 +313,7 @@
     function load() { id('L').style.display = 'flex'; }
     function unload() { id('L').style.display = 'none'; }
     
-    // Navegação de Abas
+    // Navegação
     function tab(t, b) {
         document.querySelectorAll('.card').forEach(c => c.classList.remove('act'));
         document.querySelectorAll('.btn-m').forEach(x => x.classList.remove('act'));
@@ -324,7 +322,7 @@
         if(t === 'pan') loadPan();
     }
 
-    // Validação e Máscara de CPF
+    // Validação de CPF
     function mCPF(i) {
         let v = i.value.replace(/\D/g, ""); i.setAttribute("maxlength", "14");
         if(v.length > 3) v = v.replace(/(\d{3})(\d)/, "$1.$2");
@@ -349,11 +347,9 @@
         cpfValido = true;
     }
 
-    // Formatação de Datas (Blindagem)
     function fmtBR(d) { if(!d) return ""; let p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
     function fmtUS(d) { if(!d || !d.includes('/')) return ""; let p = d.split('/'); return `${p[2]}-${p[1]}-${p[0]}`; }
 
-    // Badges de Status Dinâmicos
     function getBdg(s) {
         if(!s) return "b-yellow"; s = s.toUpperCase();
         if(s.includes("INDEFERIDO") || s.includes("IMPROCEDENTE")) return "b-red";
@@ -363,9 +359,7 @@
         return "b-yellow";
     }
 
-    // ==========================================
-    // MÓDULO 1: ENGENHARIA DE BENEFÍCIOS E REGRAS DINÂMICAS
-    // ==========================================
+    // Engenharia de Benefícios
     window.onload = () => addB("BENEFÍCIO POR INCAPACIDADE");
 
     function addB(t="BENEFÍCIO POR INCAPACIDADE", d=null) {
@@ -415,9 +409,7 @@
         }
     }
 
-    // ==========================================
-    // MÓDULO 2: SALVAMENTO E PDF
-    // ==========================================
+    // Salvamento
     let acaoAtual = "";
     function preSave(ac) {
         if(!id('nome').value || !id('cpf').value || !id('nasc').value || !id('gov').value) return alert("Preencha todos os campos obrigatórios (*).");
@@ -434,7 +426,6 @@
 
     id('btnConfSave').onclick = () => {
         fecharModal('mConf'); load();
-        
         let bens = [], hons = {};
         document.querySelectorAll('.ben-box').forEach(x => {
             let t = x.querySelector('.tBen').value; bens.push(t);
@@ -452,15 +443,13 @@
 
         fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(p)})
         .then(() => {
-            alert("Sincronização concluída com sucesso no Sheets e no Drive!");
+            alert("Operação enviada com sucesso ao servidor!");
             unload();
             if(acaoAtual !== 'regerar_documento') location.reload();
         }).catch(() => { alert("Erro de rede. Verifique a conexão."); unload(); });
     }
 
-    // ==========================================
-    // MÓDULO 3: BUSCA E EDIÇÃO RIGOROSA
-    // ==========================================
+    // Busca e Edição
     function loadCli() { load(); let s = document.createElement('script'); s.src = URL + "?action=listar_clientes&callback=drawC"; document.body.appendChild(s); }
     function drawC(r) {
         unload(); db = r.data || []; let t = id('tCli').querySelector('tbody'); t.innerHTML = "";
@@ -484,30 +473,20 @@
         id('orig').value=c.OrigemCliente||""; id('trab').value=c.EstaTrabalhando||"NÃO"; id('qSeg').value=c.QualidadeSegurado||"SIM"; id('esp').value=c.EspecialidadeMedica||"OUTRA"; id('pLau').value=c.PossuiLaudo||"SIM"; id('tLau').value=c.TempoLaudo||"PERMANENTE";
         id('fAssin').value=c.FormaAssinatura||"MANUAL"; id('sRogo').value=c.AssinaturaARogo||"NÃO";
         
-        // Reconstruir Representante
         id('tRep').value = c.TemRepresentante || "NÃO";
         document.getElementById('bRep').style.display = id('tRep').value === 'SIM' ? 'block' : 'none';
-        id('rNom').value = c.RepNome || "";
-        id('rCpf').value = c.RepCPF || "";
-        id('rRg').value = c.RepRG || "";
-        id('rPar').value = c.RepParentesco || "";
+        id('rNom').value = c.RepNome || ""; id('rCpf').value = c.RepCPF || ""; id('rRg').value = c.RepRG || ""; id('rPar').value = c.RepParentesco || "";
 
-        // Reconstruir Benefícios rigorosamente
         id('bens').innerHTML = ""; 
         try { let h = JSON.parse(c.HonorariosJSON); for(let k in h) addB(k, h[k]); } catch(e) { addB(); }
-        
         id('btnReg').style.display = "inline-flex"; cpfValido = true;
     }
 
-    // ==========================================
-    // MÓDULO 4: FICHA CRM E DRE
-    // ==========================================
+    // Ficha CRM
     function abrirFicha(cpf) { load(); let s = document.createElement('script'); s.src = URL + "?action=carregar_ficha&cpf=" + cpf + "&callback=drawF"; document.body.appendChild(s); }
     function drawF(r) {
         unload(); if(r.status !== "success") return alert("Erro ao carregar cliente.");
         let c = r.cliente; tab('fic', null);
-        
-        // DRE
         let tR=0, tD=0;
         r.financeiro.forEach(f => {
             if(f.StatusPagamento === "PAGO" || f.StatusPagamento === "EFETIVADO / PAGO") {
@@ -517,10 +496,8 @@
         });
 
         let faseAt = c.StatusProcesso || c.FaseProcesso || '-';
-
         let h = `<div class="card-header" style="display:flex; justify-content:space-between; background:var(--p); color:#fff;">
-            FICHA: ${c.Nome}
-            <button class="btn btn-w btn-sm" onclick="editar('${c.CPF}')">✏️ EDITAR CADASTRO</button>
+            FICHA: ${c.Nome} <button class="btn btn-w btn-sm" onclick="editar('${c.CPF}')">✏️ EDITAR CADASTRO</button>
         </div>
         <div class="card-body">
             <div class="grid-3" style="margin-bottom:20px;">
@@ -536,9 +513,9 @@
 
             <h3 style="color:var(--p); border-bottom:1px solid var(--b); padding-bottom:5px;">RESUMO FINANCEIRO (DRE)</h3>
             <div class="dre-grid">
-                <div class="dre-card" style="background:var(--a);"><h4>Total Faturado (Honorários)</h4><h2>R$ ${tR.toFixed(2)}</h2></div>
-                <div class="dre-card" style="background:var(--d);"><h4>Custos Escritório (Despesas)</h4><h2>R$ ${tD.toFixed(2)}</h2></div>
-                <div class="dre-card" style="background:var(--p);"><h4>LUCRO LÍQUIDO REAL</h4><h2>R$ ${(tR-tD).toFixed(2)}</h2></div>
+                <div class="dre-card" style="background:var(--a);"><h4>Faturado (Honorários)</h4><h2>R$ ${tR.toFixed(2)}</h2></div>
+                <div class="dre-card" style="background:var(--d);"><h4>Custos (Despesas)</h4><h2>R$ ${tD.toFixed(2)}</h2></div>
+                <div class="dre-card" style="background:var(--p);"><h4>LUCRO LÍQUIDO</h4><h2>R$ ${(tR-tD).toFixed(2)}</h2></div>
             </div>
             <button class="btn btn-s btn-sm" onclick="abrirFin('${c.CPF}', '${c.Nome}')" style="margin-bottom:15px;">💰 LANÇAR RECEITA OU DESPESA</button>
             <div class="table-responsive" style="margin-bottom:25px;"><table><thead><tr><th>DATA</th><th>NATUREZA</th><th>CATEGORIA</th><th>VLR FINAL</th><th>STATUS</th></tr></thead><tbody>`;
@@ -561,9 +538,7 @@
         id('fic').innerHTML = h;
     }
 
-    // ==========================================
-    // MÓDULO 5: PAINEL, AGENDA E PRAZOS
-    // ==========================================
+    // Painel e Cadastros
     function loadPan() { load(); let s = document.createElement('script'); s.src = URL + "?action=listar_painel&callback=drawP"; document.body.appendChild(s); }
     function drawP(r) {
         unload();
@@ -594,9 +569,6 @@
         load(); fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'providencia_cumprir', resp: id('user').value, cpf: cpf, tarefa: tar, limite: dt})}).then(() => { alert("Tarefa marcada como cumprida!"); location.reload(); });
     }
 
-    // ==========================================
-    // MÓDULO 6: FINANCEIRO
-    // ==========================================
     function abrirFin(cpf, nome) { id('fiCpf').value=cpf; id('fiNome').value=nome; altFin('RECEITA'); modal('mFin'); }
     function altFin(n) { id('fiNat').value=n; if(n==='RECEITA') { id('bRec').style.display='block'; id('bDes').style.display='none'; } else { id('bRec').style.display='none'; id('bDes').style.display='block'; } }
     function calcF() { let b=parseFloat(id('fiB').value)||0; let p=parseFloat(id('fiP').value)||0; let d=parseFloat(id('fiD').value)||0; let c=(b*p/100); id('fiF1').value=(c-d).toFixed(2); }
