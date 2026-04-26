@@ -16,20 +16,19 @@
 
         .container { max-width: 1250px; margin: 25px auto; padding: 0 15px; }
         
-        /* Menus */
+        /* Menus e Cards */
         .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 25px; }
         .btn-m { background: var(--c); border: 2px solid var(--b); border-bottom: 4px solid var(--s); padding: 15px; text-align: center; font-weight: 700; color: var(--s); cursor: pointer; border-radius: 6px; transition: 0.2s; text-transform: uppercase; }
         .btn-m:hover { transform: translateY(-2px); }
         .btn-m.act { background: var(--s); color: #fff; border-color: var(--p); border-bottom-color: var(--p); }
 
-        /* Cards */
         .card { background: var(--c); border-radius: 8px; border: 1px solid var(--b); margin-bottom: 20px; display: none; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .card.act { display: block; animation: fadeIn 0.3s; }
         .card-header { background: #f8fafc; color: var(--p); padding: 15px 25px; font-weight: 800; border-bottom: 1px solid var(--b); font-size: 1.1rem; text-transform: uppercase; }
         .card-body { padding: 25px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Forms */
+        /* Formulários e Grids */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
@@ -40,7 +39,7 @@
         input:focus, select:focus { border-color: var(--s); outline: none; box-shadow: 0 0 0 3px rgba(43,108,176,0.1); }
         .help-text { font-size: 0.75rem; color: #64748b; margin-top: 4px; display: block; font-style: italic; }
 
-        /* Boxes Especiais */
+        /* Caixas Dinâmicas */
         .box-sec { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
         .box-warn { background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
         .box-jud { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
@@ -52,14 +51,13 @@
         .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
         .btn:hover { filter: brightness(110%); }
 
-        /* Tabelas */
+        /* Tabelas e Badges */
         .table-responsive { overflow-x: auto; border: 1px solid var(--b); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: #fff; white-space: nowrap; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--b); }
         th { background: #f1f5f9; font-weight: 700; color: #475569; text-transform: uppercase; }
         tr:hover td { background: #f8fafc; }
 
-        /* Badges e DRE */
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
         .b-green { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
         .b-red { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
@@ -67,15 +65,17 @@
         .b-yellow { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
         .b-strike { text-decoration: line-through; background: #f1f5f9; color: #64748b; }
 
+        /* DRE e Modais */
         .dre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .dre-card { padding: 20px; border-radius: 6px; color: white; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .dre-card h4 { margin: 0 0 5px 0; font-size: 0.8rem; text-transform: uppercase; opacity: 0.9; }
         .dre-card h2 { margin: 0; font-size: 1.5rem; }
 
-        /* Modais */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-c { background: #fff; padding: 30px; border-radius: 8px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
         .modal-c h3 { margin-top: 0; color: var(--p); border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
+        
+        /* Loading */
         .loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 3000; justify-content: center; align-items: center; flex-direction: column; font-weight: 800; color: var(--p); font-size: 1.2rem; }
         .spinner { width: 50px; height: 50px; border: 5px solid var(--b); border-top: 5px solid var(--s); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -300,12 +300,11 @@
     <button class="btn btn-p" style="width:100%; margin-top:20px;" onclick="finReg()">GRAVAR NO DRE</button>
     <button onclick="fecharModal('mFin')" style="width:100%; margin-top:10px; background:none; border:none; cursor:pointer;">Fechar</button>
 </div></div>
-
 <script>
     // ==========================================
-    // URL DO SEU BACKEND (APPS SCRIPT)
+    // ETAPA 5: O MOTOR VISUAL (JavaScript)
     // ==========================================
-    const URL = "https://script.google.com/macros/s/AKfycbyvBcIo4t56IvY6fLDai4UGJEUlit4wHMlexkNEGZWtAIBqrVW_7LJHeO7EZDSZcDG8aw/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbwSS_fVEjz3znQ--8gFV1KvetUQHyfpzfGPLWOjg2HkfgWtOPSwBIz71UxRyx-tyZhsLA/exec";
     
     let db = []; // Armazena clientes para busca rápida
 
@@ -350,7 +349,7 @@
         cpfValido = true;
     }
 
-    // Formatação de Datas
+    // Formatação de Datas (Blindagem)
     function fmtBR(d) { if(!d) return ""; let p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
     function fmtUS(d) { if(!d || !d.includes('/')) return ""; let p = d.split('/'); return `${p[2]}-${p[1]}-${p[0]}`; }
 
@@ -466,13 +465,13 @@
     function drawC(r) {
         unload(); db = r.data || []; let t = id('tCli').querySelector('tbody'); t.innerHTML = "";
         db.reverse().forEach(c => {
-            t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.StatusProcesso || c.FaseProcesso)}">${c.StatusProcesso || c.FaseProcesso}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`;
+            t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.StatusProcesso || c.FaseProcesso)}">${c.StatusProcesso || c.FaseProcesso || '-'}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`;
         });
     }
     function busca() {
         let q = id('q').value.toUpperCase(); let f = db.filter(x => x.Nome.includes(q) || x.CPF.includes(q));
         let t = id('tCli').querySelector('tbody'); t.innerHTML = "";
-        f.forEach(c => { t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.StatusProcesso || c.FaseProcesso)}">${c.StatusProcesso || c.FaseProcesso}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`; });
+        f.forEach(c => { t.innerHTML += `<tr><td><strong>${c.Nome}</strong></td><td>${c.CPF}</td><td><span class="badge ${getBdg(c.StatusProcesso || c.FaseProcesso)}">${c.StatusProcesso || c.FaseProcesso || '-'}</span></td><td><button class="btn btn-p btn-sm" onclick="abrirFicha('${c.CPF}')">FICHA CRM</button></td></tr>`; });
     }
 
     function editar(cpf) {
@@ -485,7 +484,7 @@
         id('orig').value=c.OrigemCliente||""; id('trab').value=c.EstaTrabalhando||"NÃO"; id('qSeg').value=c.QualidadeSegurado||"SIM"; id('esp').value=c.EspecialidadeMedica||"OUTRA"; id('pLau').value=c.PossuiLaudo||"SIM"; id('tLau').value=c.TempoLaudo||"PERMANENTE";
         id('fAssin').value=c.FormaAssinatura||"MANUAL"; id('sRogo').value=c.AssinaturaARogo||"NÃO";
         
-        // CORREÇÃO: Preencher Dados do Representante na Edição
+        // Reconstruir Representante
         id('tRep').value = c.TemRepresentante || "NÃO";
         document.getElementById('bRep').style.display = id('tRep').value === 'SIM' ? 'block' : 'none';
         id('rNom').value = c.RepNome || "";
@@ -608,6 +607,5 @@
         fetch(URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(p)}).then(() => { alert("Lançamento Registrado no DRE!"); location.reload(); });
     }
 </script>
-
 </body>
 </html>
