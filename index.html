@@ -66,6 +66,10 @@ tr.cancelado{text-decoration:line-through;color:#999;background:#faf0f0;}
 .dre .q .v{font-size:18px;font-weight:bold;}
 a{color:var(--azul2);}
 @media(max-width:600px){nav button{padding:10px 12px;font-size:13px;}main{padding:10px;}}
+.autolist{position:absolute;z-index:50;background:#fff;border:1px solid var(--borda);border-radius:0 0 6px 6px;max-height:220px;overflow:auto;width:100%;box-shadow:0 4px 10px rgba(0,0,0,.12);display:none;}
+.autolist.show{display:block;}
+.autolist div{padding:7px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid #eef2f6;}
+.autolist div:hover{background:#eef6ff;}
 </style>
 </head>
 <body>
@@ -77,6 +81,7 @@ a{color:var(--azul2);}
   <button data-mod="cadastro" class="ativo">Cadastro</button>
   <button data-mod="agenda">Agenda &amp; Prazos</button>
   <button data-mod="financeiro">Financeiro</button>
+  <button data-mod="bi">Quadro B.I.</button>
   <button data-mod="crm">CRM</button>
 </nav>
 <main>
@@ -213,7 +218,7 @@ a{color:var(--azul2);}
       <h3>Novo lançamento</h3>
       <div class="grid3">
         <div><label>Natureza</label><select id="f_natureza" onchange="toggleNatureza()"><option>Entrada</option><option>Saída</option></select></div>
-        <div><label>Cliente (nome)</label><input id="f_nome"></div>
+        <div style="position:relative"><label>Cliente (nome ou CPF)</label><input id="f_nome" autocomplete="off" oninput="autocompleteCliente(this.value)" placeholder="digite nome ou CPF..."><div id="f_sugestoes" class="autolist"></div></div>
         <div><label>CPF</label><input id="f_cpf"></div>
         <div><label>IDCliente (opcional)</label><input id="f_idCliente"></div>
         <div><label>Benefício</label><input id="f_beneficio"></div>
@@ -224,11 +229,21 @@ a{color:var(--azul2);}
         <div><label>Desconto (R$)</label><input id="f_desconto" value="0"></div>
         <div><label>Status</label><select id="f_statusPagamento"><option>Pendente</option><option>Pago</option></select></div>
         <div><label>Data efetivação</label><input id="f_dataEfetivacao" type="date"></div>
+        <div><label>Data do próximo pagamento</label><input id="f_dataProxPag" type="date"></div>
+        <div><label>Valor do próximo pagamento (R$)</label><input id="f_valorProxPag"></div>
+        <div><label>Agência de saque</label><input id="f_agenciaSaque"></div>
       </div>
       <div><label>Observação</label><input id="f_obs"></div>
       <div class="linha-btns"><button class="btn verde" onclick="salvarFinanceiro()">Lançar</button></div>
     </div>
     <div class="card"><h3>Lançamentos</h3><div id="listaFinanceiro">carregando...</div></div>
+  </section>
+
+  <!-- ================= QUADRO B.I. ================= -->
+  <section id="mod-bi" class="modulo">
+    <h2>🩺 Quadro de Benefício por Incapacidade</h2>
+    <div class="card"><div id="biKpis"></div></div>
+    <div class="card"><h3>Casos por urgência de cessação (DCB) <button class="btn cinza pequeno" onclick="carregarPainelBI()">Atualizar</button></h3><div id="biTabela">carregando...</div></div>
   </section>
 
   <!-- ================= CRM ================= -->
@@ -244,9 +259,10 @@ a{color:var(--azul2);}
 
 <script>
 /* ================= CONFIG ================= */
-const API = "https://script.google.com/macros/s/AKfycbwL0e4DLuA3BoO9IiJ89zP10CVYPUVS0_s-oc5wVHZnuwcllnPSSApNdQx-sZ3XUywY7g/exec";
+const API = "https://script.google.com/macros/s/AKfycbyBG8qJL2bxrp8t5RHSHi6U2rbc2LUQKZSs1z0jhLgPClrFoQ-6c9QsGAyioRjB-mDbRg/exec";
 let META = null;          // metadados (fases, beneficios...)
 let usuario = "Bruno";
+let fichaAtual = null;    // contexto do cliente aberto na ficha (para movimentações)
 
 /* ================= API (JSONP GET + POST text/plain) ================= */
 function apiGet(action, params={}){
@@ -285,7 +301,8 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".modulo").forEach(m=>m.classList.remove("ativo"));
   document.getElementById("mod-"+b.dataset.mod).classList.add("ativo");
   if(b.dataset.mod==="agenda"){carregarAgenda();carregarProvidencias();}
-  if(b.dataset.mod==="financeiro"){carregarFinConsolidado();carregarFinanceiro();}
+  if(b.dataset.mod==="financeiro"){carregarFinConsolidado();carregarFinanceiro();carregarClientesCache();}
+  if(b.dataset.mod==="bi"){carregarPainelBI();}
   if(b.dataset.mod==="crm"){carregarDashboard().then(()=>carregarKanban());}
 });
 document.getElementById("selUsuario").onchange=function(){usuario=this.value;};
@@ -294,7 +311,7 @@ document.getElementById("selUsuario").onchange=function(){usuario=this.value;};
 window.addEventListener("load", async ()=>{
   try{
     const r = await apiGet("getMetadados");
-    if(r&&r.success){META=r.data;montarFases();addBeneficio();toast("Sistema conectado com sucesso!");}
+    if(r&&r.success){META=r.data;montarFases();addBeneficio();carregarClientesCache();toast("Sistema conectado com sucesso!");}
     else toast("Não foi possível carregar os metadados.",true);
   }catch(e){toast("Erro ao conectar: "+e,true);}
 });
@@ -467,6 +484,9 @@ async function abrirFicha(id){
   const r=await apiGet("getFichaCliente",{idCliente:id});
   if(!r.success){toast(r.error,true);return;}
   const d=r.data,c=d.cliente;
+  fichaAtual={id:c.idCliente,nome:c.nome,cpf:c.cpf,movMap:{}};
+  (d.movimentos||[]).forEach(m=>fichaAtual.movMap[m.IDMovimento]=m);
+  const temBI=(c.beneficios||[]).some(b=>b.tipo==="Benefício por Incapacidade")||(d.movimentos&&d.movimentos.length);
   let painel="";
   if(d.painelPrazos){const pp=d.painelPrazos;painel=`<div class="alerta ${pp.diasRestantes!==null&&pp.diasRestantes<=10?'perigo':'aviso'}">🗓️ DCB: <b>${pp.dcb}</b> — faltam ${pp.diasRestantes} dia(s). Prorrogação: ${pp.permitiuProrrogacao}. ${(pp.providencias||[]).map(p=>p.providencia+" ("+p.status+", limite "+p.dataLimite+")").join(" · ")}</div>`;}
   const dre=d.dre||{};
@@ -474,6 +494,7 @@ async function abrirFicha(id){
    <h3>${c.nome}</h3>
    <p class="mut">CPF ${c.cpf} · ${c.cidade||''}/${c.uf||''} · Fase: ${badgeFase(c.statusProcesso)}</p>
    ${painel}
+   ${temBI?`<h3>🩺 Benefício por Incapacidade — Linha do tempo do caso</h3>${renderTimeline(d)}`:''}
    <div class="dre"><div class="q fat"><div class="l">Faturado</div><div class="v">${dre.totalFaturadoFmt||'R$ 0,00'}</div></div>
      <div class="q cus"><div class="l">Custos</div><div class="v">${dre.custosFmt||'R$ 0,00'}</div></div>
      <div class="q luc"><div class="l">Lucro Líquido</div><div class="v">${dre.lucroFmt||'R$ 0,00'}</div></div></div>
@@ -495,6 +516,128 @@ async function revelarSenha(id){
   const r=await apiGet("revelarSenhaINSS",{idCliente:id,responsavel:usuario});
   if(r.success)document.getElementById("senhaRev").innerHTML="<b>Senha:</b> "+r.data.senha;
   else toast(r.error,true);
+}
+
+/* ========= MOVIMENTAÇÕES — Benefício por Incapacidade (linha do tempo) ========= */
+function badgeTipoMov(t){
+  const m={'Concessão':'verde','Prorrogação':'verde','Nova Solicitação':'azul','1ª Solicitação (Administrativa)':'azul','Indeferimento':'vermelho','Cessação':'cinza','Ação Judicial':'azul','Sentença / Perícia Judicial':'verde','Perícia':'amarelo','Exigência INSS':'amarelo','Recurso Administrativo':'amarelo'};
+  return `<span class="badge ${m[t]||'amarelo'}">${t||'-'}</span>`;
+}
+function renderTimeline(d){
+  const movs=d.movimentos||[]; const rz=d.resumoIncapacidade;
+  let resumo="";
+  if(rz){
+    const cor=(rz.diasAteDCB!==null&&rz.diasAteDCB<=15)?'perigo':'aviso';
+    resumo=`<div class="alerta ${cor}"><b>NB atual:</b> ${rz.nbAtual||'—'} · ${badgeTipoMov(rz.tipoAtual)} · <b>Cessa (DCB):</b> ${rz.dcbAtual||'—'}${rz.diasAteDCB!==null?` — faltam ${rz.diasAteDCB} dia(s)`:''} · <b>Prorrogação:</b> ${rz.permiteProrrogacao||'—'}${rz.proximaAcao?`<br>➡️ <b>Próxima ação:</b> ${rz.proximaAcao} — <b>${rz.dataProximaAcao||''}</b>`:''}</div>`;
+  }
+  const lista=movs.length?movs.map(cardMovimento).join(""):'<span class="mut">— nenhuma movimentação lançada ainda —</span>';
+  return `${resumo}<div style="margin:8px 0;"><button class="btn verde pequeno" onclick="abrirFormMovimento()">＋ Nova movimentação</button></div>${lista}`;
+}
+function cardMovimento(m){
+  const saques=(m.saques||[]).map(s=>`${s.data||''}${s.valor?(' — R$ '+s.valor):''}`).join(' · ');
+  const L=[];
+  if(m.NB)L.push(`<b>NB:</b> ${m.NB}`);
+  if(m.DER)L.push(`<b>DER:</b> ${m.DER}`);
+  if(m.DIB||m.DCB)L.push(`<b>DIB→DCB:</b> ${m.DIB||'?'} → ${m.DCB||'?'}`);
+  if(m.PermiteProrrogacao&&m.PermiteProrrogacao!=='Aguardando definição')L.push(`<b>Prorrog.:</b> ${m.PermiteProrrogacao}`);
+  if(m.ValorMensal)L.push(`<b>Valor:</b> R$ ${m.ValorMensal}`);
+  if(m.AgenciaSaque)L.push(`<b>Ag. saque:</b> ${m.AgenciaSaque}`);
+  if(saques)L.push(`<b>Saques:</b> ${saques}`);
+  if(m.NumProcesso)L.push(`<b>Proc.:</b> ${m.NumProcesso}${m.Vara?(' ('+m.Vara+')'):''}`);
+  if(m.ResultadoPericia)L.push(`<b>Perícia jud.:</b> ${m.ResultadoPericia}`);
+  if(m.DataSentenca)L.push(`<b>Sentença:</b> ${m.DataSentenca}`);
+  if(m.DataConcessaoJudicial)L.push(`<b>Concessão jud.:</b> ${m.DataConcessaoJudicial}`);
+  if(m.Retroativo)L.push(`<b>Retroativo:</b> R$ ${m.Retroativo}`);
+  if(m.DCBJudicial)L.push(`<b>DCB judicial:</b> ${m.DCBJudicial}`);
+  if(m.ResultadoFinal)L.push(`<b>Resultado:</b> ${m.ResultadoFinal}`);
+  if(m.ProximaAcao)L.push(`➡️ <b>Próxima:</b> ${m.ProximaAcao} (${m.DataProximaAcao||''})`);
+  if(m.Observacao)L.push(`<i>${m.Observacao}</i>`);
+  return `<div class="card" style="padding:10px;margin-bottom:8px;border-left:4px solid var(--azul2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+      <div><b>#${m.Ordem||''}</b> ${badgeTipoMov(m.Tipo)} <span class="mut">${m.DataRegistro||''}</span></div>
+      <div><button class="btn cinza pequeno" onclick="abrirFormMovimento('${m.IDMovimento}')">Editar</button>
+           <button class="btn vermelho pequeno" onclick="cancelarMovimento('${m.IDMovimento}')">Excluir</button></div>
+    </div>
+    <div style="margin-top:6px;font-size:13px;line-height:1.8;">${L.join(' · ')}</div></div>`;
+}
+function abrirFormMovimento(idMov){
+  if(!fichaAtual){toast("Abra a ficha de um cliente primeiro.",true);return;}
+  const m=idMov?fichaAtual.movMap[idMov]:null;
+  const tipos=(META&&META.tiposMovimento)||["1ª Solicitação (Administrativa)","Concessão","Prorrogação","Nova Solicitação","Exigência INSS","Perícia","Cessação","Indeferimento","Recurso Administrativo","Ação Judicial","Sentença / Perícia Judicial"];
+  const g=k=>m?(m[k]||''):'';
+  abrirModal(`<h3>${m?'Editar':'Nova'} movimentação — ${fichaAtual.nome}</h3>
+   <input type="hidden" id="m_id" value="${m?m.IDMovimento:''}"><input type="hidden" id="m_ordem" value="${m?(m.Ordem||''):''}">
+   <label>Tipo de movimentação</label>
+   <select id="m_tipo" onchange="toggleMovJudicial()">${tipos.map(t=>`<option ${g('Tipo')===t?'selected':''}>${t}</option>`).join("")}</select>
+   <div class="grid3">
+     <div><label>NB (nº do benefício)</label><input id="m_nb" value="${g('NB')}"></div>
+     <div><label>DER (data do requerimento)</label><input id="m_der" type="date" value="${brParaIso(g('DER'))}"></div>
+     <div><label>DIB (início)</label><input id="m_dib" type="date" value="${brParaIso(g('DIB'))}"></div>
+     <div><label>DCB (cessação)</label><input id="m_dcb" type="date" value="${brParaIso(g('DCB'))}"></div>
+     <div><label>INSS permite prorrogar?</label><select id="m_permite"><option>Aguardando definição</option><option ${g('PermiteProrrogacao')==='Sim, permitiu'?'selected':''}>Sim, permitiu</option><option ${g('PermiteProrrogacao')==='Não permitiu'?'selected':''}>Não permitiu</option></select></div>
+     <div><label>Valor mensal (R$)</label><input id="m_valorMensal" value="${g('ValorMensal')}"></div>
+     <div><label>Agência de saque</label><input id="m_agencia" value="${g('AgenciaSaque')}"></div>
+   </div>
+   <label>Saques (datas e valores) <button class="btn verde pequeno" onclick="addSaque()">＋ saque</button></label>
+   <div id="m_saques"></div>
+   <div id="m_blocoJudicial" class="oculto">
+     <h4 style="color:var(--azul2);margin:10px 0 4px;">Ação judicial</h4>
+     <div class="grid3">
+       <div><label>Nº do processo</label><input id="m_numProcesso" value="${g('NumProcesso')}"></div>
+       <div><label>Vara/Juízo</label><input id="m_vara" value="${g('Vara')}"></div>
+       <div><label>Data da sentença</label><input id="m_dataSentenca" type="date" value="${brParaIso(g('DataSentenca'))}"></div>
+       <div><label>Resultado da perícia judicial</label><input id="m_resultadoPericia" value="${g('ResultadoPericia')}"></div>
+       <div><label>Data concessão (judicial)</label><input id="m_dataConcessaoJudicial" type="date" value="${brParaIso(g('DataConcessaoJudicial'))}"></div>
+       <div><label>Retroativo (R$)</label><input id="m_retroativo" value="${g('Retroativo')}"></div>
+       <div><label>DCB judicial</label><input id="m_dcbJudicial" type="date" value="${brParaIso(g('DCBJudicial'))}"></div>
+       <div><label>Resultado final</label><select id="m_resultadoFinal"><option value="">--</option><option ${g('ResultadoFinal')==='Procedente'?'selected':''}>Procedente</option><option ${g('ResultadoFinal')==='Improcedente'?'selected':''}>Improcedente</option><option ${g('ResultadoFinal')==='Acordo'?'selected':''}>Acordo</option></select></div>
+     </div>
+   </div>
+   <label>Observação</label><textarea id="m_obs">${g('Observacao')}</textarea>
+   <div class="linha-btns"><button class="btn verde" onclick="salvarMovimento()">Salvar movimentação</button><button class="btn cinza" onclick="fecharModal()">Cancelar</button></div>`);
+  const saques=(m&&m.saques)||[];
+  saques.forEach(s=>addSaque(s));
+  toggleMovJudicial();
+}
+function addSaque(s){
+  const cont=document.getElementById("m_saques");if(!cont)return;
+  const div=document.createElement("div");div.className="linha-saque";div.style="display:flex;gap:6px;margin-bottom:4px;";
+  div.innerHTML=`<input type="date" class="sq-data" value="${s&&s.data?brParaIso(s.data):''}" style="flex:1">
+    <input class="sq-valor" placeholder="valor R$" value="${s&&s.valor?s.valor:''}" style="flex:1">
+    <button class="btn vermelho pequeno" onclick="this.parentNode.remove()">x</button>`;
+  cont.appendChild(div);
+}
+function toggleMovJudicial(){
+  const t=val("m_tipo");const jud=(t==="Ação Judicial"||t==="Sentença / Perícia Judicial");
+  const b=document.getElementById("m_blocoJudicial");if(b)b.classList.toggle("oculto",!jud);
+}
+function coletarSaques(){
+  const arr=[];
+  document.querySelectorAll("#m_saques .linha-saque").forEach(r=>{
+    const data=isoParaBR(r.querySelector(".sq-data").value);const valor=r.querySelector(".sq-valor").value.trim();
+    if(data||valor)arr.push({data:data,valor:valor});
+  });
+  return arr;
+}
+async function salvarMovimento(){
+  if(!fichaAtual)return;
+  const d={idMovimento:val("m_id"),ordem:val("m_ordem"),idCliente:fichaAtual.id,tipo:val("m_tipo"),
+    nb:val("m_nb"),der:isoParaBR(val("m_der")),dib:isoParaBR(val("m_dib")),dcb:isoParaBR(val("m_dcb")),
+    permiteProrrogacao:val("m_permite"),valorMensal:val("m_valorMensal"),agenciaSaque:val("m_agencia"),
+    saques:coletarSaques(),numProcesso:val("m_numProcesso"),vara:val("m_vara"),
+    dataSentenca:isoParaBR(val("m_dataSentenca")),resultadoPericia:val("m_resultadoPericia"),
+    dataConcessaoJudicial:isoParaBR(val("m_dataConcessaoJudicial")),retroativo:val("m_retroativo"),
+    dcbJudicial:isoParaBR(val("m_dcbJudicial")),resultadoFinal:val("m_resultadoFinal"),
+    observacao:val("m_obs"),responsavel:usuario};
+  toast("Salvando movimentação...");
+  const r=await apiPost("salvarMovimento",d);
+  if(r&&r.success){fecharModal();toast("Movimentação salva!");abrirFicha(fichaAtual.id);}
+  else toast((r&&r.error)||"Erro ao salvar.",true);
+}
+async function cancelarMovimento(id){
+  if(!confirm("Excluir esta movimentação da linha do tempo?"))return;
+  const r=await apiPost("cancelarMovimento",{idMovimento:id,responsavel:usuario});
+  if(r&&r.success){toast("Movimentação excluída.");abrirFicha(fichaAtual.id);}else toast((r&&r.error)||"Erro.",true);
 }
 
 /* ================= AGENDA ================= */
@@ -539,7 +682,8 @@ function toggleNatureza(){const ent=val("f_natureza")==="Entrada";document.getEl
 async function salvarFinanceiro(){
   const d={natureza:val("f_natureza"),nome:val("f_nome"),cpf:val("f_cpf"),idCliente:val("f_idCliente"),beneficio:val("f_beneficio"),
     tipoEntrada:val("f_tipoEntrada"),categoria:val("f_categoria"),valorBruto:val("f_valorBruto"),percentualHonorario:val("f_percentualHonorario"),
-    desconto:val("f_desconto"),statusPagamento:val("f_statusPagamento"),dataEfetivacao:isoParaBR(val("f_dataEfetivacao")),observacao:val("f_obs"),responsavel:usuario};
+    desconto:val("f_desconto"),statusPagamento:val("f_statusPagamento"),dataEfetivacao:isoParaBR(val("f_dataEfetivacao")),observacao:val("f_obs"),
+    dataProximoPagamento:isoParaBR(val("f_dataProxPag")),valorProximoPagamento:val("f_valorProxPag"),agenciaSaque:val("f_agenciaSaque"),responsavel:usuario};
   const r=await apiPost("salvarFinanceiro",d);if(r.success){toast("Lançamento salvo!");carregarFinanceiro();carregarFinConsolidado();}else toast(r.error,true);
 }
 async function carregarFinanceiro(){
@@ -560,6 +704,56 @@ async function carregarFinConsolidado(){
     <div class="kpi"><div class="v">${fmt(d.totalAReceber)}</div><div class="l">A receber</div></div>
     <div class="kpi"><div class="v">${fmt(d.totalRecebidoMes)}</div><div class="l">Recebido no mês</div></div>
     <p><b>Inadimplentes:</b> ${inad}</p><p><b>Despesas por categoria:</b> ${desp}</p>`;
+}
+
+/* ========= AUTOCOMPLETE DE CLIENTES + QUADRO B.I. ========= */
+let CLIENTES_CACHE=[];
+async function carregarClientesCache(){
+  try{const r=await apiGet("listarClientes");if(r&&r.success)CLIENTES_CACHE=r.data||[];}catch(e){}
+}
+function autocompleteCliente(term){
+  const box=document.getElementById("f_sugestoes");if(!box)return;
+  term=(term||"").toLowerCase().trim();const dig=term.replace(/\D/g,"");
+  if(!term){box.classList.remove("show");box.innerHTML="";return;}
+  const res=CLIENTES_CACHE.filter(c=>{
+    const nomeOk=String(c.nome||"").toLowerCase().indexOf(term)!==-1;
+    const cpfOk=dig&&String(c.cpf||"").replace(/\D/g,"").indexOf(dig)!==-1;
+    return nomeOk||cpfOk;
+  }).slice(0,8);
+  if(!res.length){box.innerHTML='<div class="mut" style="cursor:default">nenhum cliente encontrado (pode digitar manualmente)</div>';box.classList.add("show");return;}
+  box.innerHTML=res.map(c=>`<div onclick="selecionarClienteFin('${c.idCliente}')">${c.nome} <span class="mut">— ${c.cpf||''}${(c.beneficios||[]).length?(' · '+(c.beneficios||[]).join(", ")):''}</span></div>`).join("");
+  box.classList.add("show");
+}
+function selecionarClienteFin(id){
+  const c=CLIENTES_CACHE.find(x=>x.idCliente===id);if(!c)return;
+  setv("f_nome",c.nome);setv("f_cpf",c.cpf||"");setv("f_idCliente",c.idCliente);
+  if((c.beneficios||[]).length===1)setv("f_beneficio",c.beneficios[0]);
+  const box=document.getElementById("f_sugestoes");if(box){box.classList.remove("show");box.innerHTML="";}
+}
+document.addEventListener("click",e=>{const b=document.getElementById("f_sugestoes");if(b&&!e.target.closest("#f_sugestoes")&&e.target.id!=="f_nome")b.classList.remove("show");});
+async function carregarPainelBI(){
+  const kp=document.getElementById("biKpis");const el=document.getElementById("biTabela");
+  if(el)el.innerHTML="carregando...";
+  const r=await apiGet("getPainelBI");
+  if(!r||!r.success){if(el)el.innerHTML="Erro: "+((r&&r.error)||"falha ao carregar");return;}
+  const d=r.data;
+  if(kp)kp.innerHTML=`<div class="kpi"><div class="v">${d.total||0}</div><div class="l">Casos de B.I.</div></div>
+    <div class="kpi"><div class="v" style="color:#c98a00">${d.cessando15||0}</div><div class="l">Cessam em ≤15 dias</div></div>
+    <div class="kpi"><div class="v" style="color:#b0281f">${d.cessados||0}</div><div class="l">Já cessados (ação!)</div></div>`;
+  if(!d.linhas||!d.linhas.length){if(el)el.innerHTML='<span class="mut">Nenhum caso de B.I. com movimentação lançada.</span>';return;}
+  el.innerHTML='<table><tr><th>Cliente</th><th>NB</th><th>Última mov.</th><th>DCB</th><th>Dias</th><th>Prorrog.</th><th>Próxima ação</th><th></th></tr>'+
+    d.linhas.map(l=>{
+      const dd=l.diasAteDCB;
+      const cor=dd===null?'':dd<0?'style="color:#b0281f;font-weight:bold"':dd<=15?'style="color:#c98a00;font-weight:bold"':'';
+      return `<tr><td>${l.nome}</td><td>${l.nb||'—'}</td><td>${l.tipo||'—'}</td><td>${l.dcb||'—'}</td><td ${cor}>${dd===null?'—':dd}</td><td>${l.permite||'—'}</td><td>${l.proximaAcao?(l.proximaAcao+' ('+(l.dataProximaAcao||'')+')'):'—'}</td><td><button class="btn cinza pequeno" onclick="abrirFichaBI('${l.idCliente}')">Abrir</button></td></tr>`;
+    }).join("")+'</table>';
+}
+function abrirFichaBI(id){
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("ativo"));
+  const btn=document.querySelector('nav button[data-mod="cadastro"]');if(btn)btn.classList.add("ativo");
+  document.querySelectorAll(".modulo").forEach(m=>m.classList.remove("ativo"));
+  document.getElementById("mod-cadastro").classList.add("ativo");
+  abrirFicha(id);
 }
 
 /* ================= CRM ================= */
