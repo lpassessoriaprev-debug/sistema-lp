@@ -216,25 +216,27 @@ a{color:var(--azul2);}
     </div>
     <div class="card">
       <h3>Novo lançamento</h3>
+      <input type="hidden" id="f_idLancamento">
       <div class="grid3">
         <div><label>Natureza</label><select id="f_natureza" onchange="toggleNatureza()"><option>Entrada</option><option>Saída</option></select></div>
-        <div style="position:relative"><label>Cliente (nome ou CPF)</label><input id="f_nome" autocomplete="off" oninput="autocompleteCliente(this.value)" placeholder="digite nome ou CPF..."><div id="f_sugestoes" class="autolist"></div></div>
+        <div style="position:relative"><label>Cliente (opcional — nome ou CPF)</label><input id="f_nome" autocomplete="off" oninput="autocompleteCliente(this.value)" placeholder="digite nome ou CPF..."><div id="f_sugestoes" class="autolist"></div></div>
         <div><label>CPF</label><input id="f_cpf"></div>
         <div><label>IDCliente (opcional)</label><input id="f_idCliente"></div>
         <div><label>Benefício</label><input id="f_beneficio"></div>
         <div id="f_wrapTipo"><label>Tipo de entrada</label><select id="f_tipoEntrada"><option>Retroativo Total</option><option>Parcela Mensal</option><option>Pagamento Único</option><option>Conversão</option></select></div>
         <div id="f_wrapCat" class="oculto"><label>Categoria (saída)</label><select id="f_categoria"><option>Uber</option><option>Consulta Médica</option><option>Perícia Particular</option><option>Taxas</option><option>Outros</option></select></div>
-        <div><label>Valor bruto (R$)</label><input id="f_valorBruto" value="0"></div>
+        <div><label>Valor bruto (R$)</label><input id="f_valorBruto" value="0" oninput="mascaraMoeda(this)"></div>
         <div id="f_wrapPerc"><label>% honorário</label><input id="f_percentualHonorario" value="0"></div>
-        <div><label>Desconto (R$)</label><input id="f_desconto" value="0"></div>
+        <div><label>Desconto (R$)</label><input id="f_desconto" value="0" oninput="mascaraMoeda(this)"></div>
+        <div><label>Valor recebido / pago (R$)</label><input id="f_valorRecebido" placeholder="valor exato que entrou/saiu" oninput="mascaraMoeda(this)"></div>
         <div><label>Status</label><select id="f_statusPagamento"><option>Pendente</option><option>Pago</option></select></div>
         <div><label>Data efetivação</label><input id="f_dataEfetivacao" type="date"></div>
         <div><label>Data do próximo pagamento</label><input id="f_dataProxPag" type="date"></div>
-        <div><label>Valor do próximo pagamento (R$)</label><input id="f_valorProxPag"></div>
+        <div><label>Valor do próximo pagamento (R$)</label><input id="f_valorProxPag" oninput="mascaraMoeda(this)"></div>
         <div><label>Agência de saque</label><input id="f_agenciaSaque"></div>
       </div>
       <div><label>Observação</label><input id="f_obs"></div>
-      <div class="linha-btns"><button class="btn verde" onclick="salvarFinanceiro()">Lançar</button></div>
+      <div class="linha-btns"><button class="btn verde" onclick="salvarFinanceiro()">Salvar lançamento</button><button class="btn cinza" onclick="limparFinanceiro()">Limpar / Novo</button></div>
     </div>
     <div class="card"><h3>Lançamentos</h3><div id="listaFinanceiro">carregando...</div></div>
   </section>
@@ -293,6 +295,13 @@ function val(id){const e=document.getElementById(id);return e?e.value.trim():"";
 function setv(id,v){const e=document.getElementById(id);if(e)e.value=(v===undefined||v===null)?"":v;}
 function isoParaBR(s){if(!s)return"";const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?m[3]+"/"+m[2]+"/"+m[1]:s;}
 function brParaIso(s){if(!s)return"";const m=String(s).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return m?m[3]+"-"+m[2]+"-"+m[1]:"";}
+/* ===== moeda + utilidades de tela ===== */
+function num2(v){if(typeof v==="number")return isNaN(v)?0:v;var s=String(v||"").trim().replace(/R\$/g,"").replace(/\s/g,"");if(!s)return 0;if(s.indexOf(",")!==-1)s=s.replace(/\./g,"").replace(",",".");var n=parseFloat(s);return isNaN(n)?0:n;}
+function fmtBRL(v){return "R$ "+num2(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function mascaraMoeda(inp){let dg=inp.value.replace(/\D/g,"");if(!dg){inp.value="";return;}dg=String(parseInt(dg,10));while(dg.length<3)dg="0"+dg;inp.value=Number(dg.slice(0,-2)).toLocaleString("pt-BR")+","+dg.slice(-2);}
+function limparBusca(){const e=document.getElementById("resultadoBusca");if(e)e.innerHTML="";const b=document.getElementById("buscaCli");if(b)b.value="";}
+function fecharFicha(){const f=document.getElementById("fichaCliente");if(f)f.classList.add("oculto");}
+
 
 /* ================= Navegação ================= */
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
@@ -451,7 +460,7 @@ function renderResultado(r){
   const el=document.getElementById("resultadoBusca");
   if(!r.success){el.innerHTML='<span class="mut">'+(r.error||"erro")+'</span>';return;}
   if(!r.data.length){el.innerHTML='<span class="mut">Nenhum cliente encontrado.</span>';return;}
-  el.innerHTML='<table><tr><th>Nome</th><th>CPF</th><th>Benefícios</th><th>Fase</th><th>Ações</th></tr>'+
+  el.innerHTML='<div style="margin-bottom:6px"><button class="btn cinza pequeno" onclick="limparBusca()">✕ Fechar lista</button></div><table><tr><th>Nome</th><th>CPF</th><th>Benefícios</th><th>Fase</th><th>Ações</th></tr>'+
     r.data.map(c=>`<tr><td>${c.nome}</td><td>${c.cpf}</td><td>${(c.beneficios||[]).join(", ")}</td><td>${badgeFase(c.fase)}</td>
       <td><button class="btn pequeno" onclick="carregarCliente('${c.idCliente}')">Editar</button>
           <button class="btn cinza pequeno" onclick="abrirFicha('${c.idCliente}')">Ficha</button></td></tr>`).join("")+'</table>';
@@ -481,12 +490,14 @@ async function carregarCliente(id){
   toast("Cliente carregado para edição.");
 }
 async function abrirFicha(id){
+  try{
   const r=await apiGet("getFichaCliente",{idCliente:id});
   if(!r.success){toast(r.error,true);return;}
   const d=r.data,c=d.cliente;
   fichaAtual={id:c.idCliente,nome:c.nome,cpf:c.cpf,movMap:{}};
   (d.movimentos||[]).forEach(m=>fichaAtual.movMap[m.IDMovimento]=m);
   const temBI=(c.beneficios||[]).some(b=>b.tipo==="Benefício por Incapacidade")||(d.movimentos&&d.movimentos.length);
+  (d.financeiro||[]).forEach(f=>{f.ValorFinal=fmtBRL(f.ValorFinal);});
   let painel="";
   if(d.painelPrazos){const pp=d.painelPrazos;painel=`<div class="alerta ${pp.diasRestantes!==null&&pp.diasRestantes<=10?'perigo':'aviso'}">🗓️ DCB: <b>${pp.dcb}</b> — faltam ${pp.diasRestantes} dia(s). Prorrogação: ${pp.permitiuProrrogacao}. ${(pp.providencias||[]).map(p=>p.providencia+" ("+p.status+", limite "+p.dataLimite+")").join(" · ")}</div>`;}
   const dre=d.dre||{};
@@ -503,9 +514,10 @@ async function abrirFicha(id){
    <h3>Agendamentos</h3>${tabelaSimples(d.agenda,["DataAgendamento","Hora","Tipo","Status","Resultado"])}
    <h3>Providências</h3>${tabelaSimples(d.providencias,["Providencia","DataLimite","Status"])}
    <h3>Financeiro</h3>${tabelaSimples(d.financeiro,["Natureza","Beneficio","ValorFinal","StatusPagamento","DataEfetivacao"])}
-   <div class="linha-btns"><button class="btn" onclick="carregarCliente('${c.idCliente}');document.getElementById('fichaCliente').classList.add('oculto');">Editar cadastro</button></div>`;
+   <div class="linha-btns"><button class="btn" onclick="carregarCliente('${c.idCliente}');document.getElementById('fichaCliente').classList.add('oculto');">Editar cadastro</button><button class="btn cinza" onclick="fecharFicha()">✕ Fechar ficha</button></div>`;
   const fc=document.getElementById("fichaCliente");fc.classList.remove("oculto");document.getElementById("fichaConteudo").innerHTML=html;
   window.scrollTo(0,fc.offsetTop-60);
+  }catch(e){toast("Erro ao abrir a ficha: "+e,true);}
 }
 function tabelaSimples(arr,cols){
   if(!arr||!arr.length)return '<span class="mut">— nenhum registro —</span>';
@@ -575,7 +587,7 @@ function abrirFormMovimento(idMov){
      <div><label>DIB (início)</label><input id="m_dib" type="date" value="${brParaIso(g('DIB'))}"></div>
      <div><label>DCB (cessação)</label><input id="m_dcb" type="date" value="${brParaIso(g('DCB'))}"></div>
      <div><label>INSS permite prorrogar?</label><select id="m_permite"><option>Aguardando definição</option><option ${g('PermiteProrrogacao')==='Sim, permitiu'?'selected':''}>Sim, permitiu</option><option ${g('PermiteProrrogacao')==='Não permitiu'?'selected':''}>Não permitiu</option></select></div>
-     <div><label>Valor mensal (R$)</label><input id="m_valorMensal" value="${g('ValorMensal')}"></div>
+     <div><label>Valor mensal (R$)</label><input id="m_valorMensal" value="${g('ValorMensal')}" oninput="mascaraMoeda(this)"></div>
      <div><label>Agência de saque</label><input id="m_agencia" value="${g('AgenciaSaque')}"></div>
    </div>
    <label>Saques (datas e valores) <button class="btn verde pequeno" onclick="addSaque()">＋ saque</button></label>
@@ -588,7 +600,7 @@ function abrirFormMovimento(idMov){
        <div><label>Data da sentença</label><input id="m_dataSentenca" type="date" value="${brParaIso(g('DataSentenca'))}"></div>
        <div><label>Resultado da perícia judicial</label><input id="m_resultadoPericia" value="${g('ResultadoPericia')}"></div>
        <div><label>Data concessão (judicial)</label><input id="m_dataConcessaoJudicial" type="date" value="${brParaIso(g('DataConcessaoJudicial'))}"></div>
-       <div><label>Retroativo (R$)</label><input id="m_retroativo" value="${g('Retroativo')}"></div>
+       <div><label>Retroativo (R$)</label><input id="m_retroativo" value="${g('Retroativo')}" oninput="mascaraMoeda(this)"></div>
        <div><label>DCB judicial</label><input id="m_dcbJudicial" type="date" value="${brParaIso(g('DCBJudicial'))}"></div>
        <div><label>Resultado final</label><select id="m_resultadoFinal"><option value="">--</option><option ${g('ResultadoFinal')==='Procedente'?'selected':''}>Procedente</option><option ${g('ResultadoFinal')==='Improcedente'?'selected':''}>Improcedente</option><option ${g('ResultadoFinal')==='Acordo'?'selected':''}>Acordo</option></select></div>
      </div>
@@ -603,7 +615,7 @@ function addSaque(s){
   const cont=document.getElementById("m_saques");if(!cont)return;
   const div=document.createElement("div");div.className="linha-saque";div.style="display:flex;gap:6px;margin-bottom:4px;";
   div.innerHTML=`<input type="date" class="sq-data" value="${s&&s.data?brParaIso(s.data):''}" style="flex:1">
-    <input class="sq-valor" placeholder="valor R$" value="${s&&s.valor?s.valor:''}" style="flex:1">
+    <input class="sq-valor" placeholder="valor R$" value="${s&&s.valor?s.valor:''}" style="flex:1" oninput="mascaraMoeda(this)">
     <button class="btn vermelho pequeno" onclick="this.parentNode.remove()">x</button>`;
   cont.appendChild(div);
 }
@@ -680,18 +692,37 @@ async function cumprirProvidencia(id){const r=await apiPost("cumprirProvidencia"
 /* ================= FINANCEIRO ================= */
 function toggleNatureza(){const ent=val("f_natureza")==="Entrada";document.getElementById("f_wrapTipo").classList.toggle("oculto",!ent);document.getElementById("f_wrapPerc").classList.toggle("oculto",!ent);document.getElementById("f_wrapCat").classList.toggle("oculto",ent);}
 async function salvarFinanceiro(){
-  const d={natureza:val("f_natureza"),nome:val("f_nome"),cpf:val("f_cpf"),idCliente:val("f_idCliente"),beneficio:val("f_beneficio"),
+  const d={idLancamento:val("f_idLancamento"),natureza:val("f_natureza"),nome:val("f_nome"),cpf:val("f_cpf"),idCliente:val("f_idCliente"),beneficio:val("f_beneficio"),
     tipoEntrada:val("f_tipoEntrada"),categoria:val("f_categoria"),valorBruto:val("f_valorBruto"),percentualHonorario:val("f_percentualHonorario"),
-    desconto:val("f_desconto"),statusPagamento:val("f_statusPagamento"),dataEfetivacao:isoParaBR(val("f_dataEfetivacao")),observacao:val("f_obs"),
+    desconto:val("f_desconto"),valorRecebido:val("f_valorRecebido"),statusPagamento:val("f_statusPagamento"),dataEfetivacao:isoParaBR(val("f_dataEfetivacao")),observacao:val("f_obs"),
     dataProximoPagamento:isoParaBR(val("f_dataProxPag")),valorProximoPagamento:val("f_valorProxPag"),agenciaSaque:val("f_agenciaSaque"),responsavel:usuario};
-  const r=await apiPost("salvarFinanceiro",d);if(r.success){toast("Lançamento salvo!");carregarFinanceiro();carregarFinConsolidado();}else toast(r.error,true);
+  const r=await apiPost("salvarFinanceiro",d);if(r.success){toast(d.idLancamento?"Lançamento atualizado!":"Lançamento salvo!");limparFinanceiro();carregarFinanceiro();carregarFinConsolidado();}else toast(r.error,true);
 }
+function limparFinanceiro(){["f_idLancamento","f_nome","f_cpf","f_idCliente","f_beneficio","f_valorRecebido","f_dataEfetivacao","f_obs","f_dataProxPag","f_valorProxPag","f_agenciaSaque"].forEach(id=>setv(id,""));setv("f_valorBruto","0");setv("f_percentualHonorario","0");setv("f_desconto","0");setv("f_statusPagamento","Pendente");}
+let FIN_CACHE=[];
 async function carregarFinanceiro(){
   const r=await apiGet("listarFinanceiro");const el=document.getElementById("listaFinanceiro");
   if(!r.success){el.innerHTML=r.error;return;}
-  if(!r.data.length){el.innerHTML='<span class="mut">Sem lançamentos.</span>';return;}
-  el.innerHTML='<table><tr><th>Data</th><th>Cliente</th><th>Natureza</th><th>Categoria/Tipo</th><th>Valor Final</th><th>Status</th></tr>'+
-    r.data.map(f=>`<tr><td>${f.DataRegistro}</td><td>${f.Nome||''}</td><td>${f.Natureza}</td><td>${f.Categoria||f.TipoEntrada||''}</td><td>R$ ${Number(f.ValorFinal||0).toFixed(2).replace('.',',')}</td><td>${f.StatusPagamento}</td></tr>`).join("")+'</table>';
+  FIN_CACHE=r.data||[];
+  if(!FIN_CACHE.length){el.innerHTML='<span class="mut">Sem lançamentos.</span>';return;}
+  el.innerHTML='<table><tr><th>Data</th><th>Cliente</th><th>Natureza</th><th>Categoria/Tipo</th><th>Valor Final</th><th>Status</th><th></th></tr>'+
+    FIN_CACHE.map(f=>`<tr><td>${f.DataRegistro}</td><td>${f.Nome||'—'}</td><td>${f.Natureza}</td><td>${f.Natureza==='Saída'?(f.Categoria||''):(f.TipoEntrada||'')}</td><td>R$ ${Number(f.ValorFinal||0).toFixed(2).replace('.',',')}</td><td>${f.StatusPagamento}</td>
+      <td><button class="btn cinza pequeno" onclick="editarLancamento('${f.IDLancamento}')">Editar</button> <button class="btn vermelho pequeno" onclick="excluirLancamento('${f.IDLancamento}')">Excluir</button></td></tr>`).join("")+'</table>';
+}
+function editarLancamento(id){
+  const f=FIN_CACHE.find(x=>String(x.IDLancamento)===String(id));if(!f)return;
+  setv("f_idLancamento",f.IDLancamento);setv("f_natureza",f.Natureza);toggleNatureza();
+  setv("f_nome",f.Nome);setv("f_cpf",f.CPF);setv("f_idCliente",f.IDCliente);setv("f_beneficio",f.Beneficio);
+  setv("f_tipoEntrada",f.TipoEntrada);setv("f_categoria",f.Categoria);
+  setv("f_valorBruto",f.ValorBruto);setv("f_percentualHonorario",f.PercentualHonorario);setv("f_desconto",f.Desconto);
+  setv("f_valorRecebido",f.ValorRecebido);setv("f_statusPagamento",f.StatusPagamento);setv("f_dataEfetivacao",brParaIso(f.DataEfetivacao));setv("f_obs",f.Observacao);
+  setv("f_dataProxPag",brParaIso(f.DataProximoPagamento));setv("f_valorProxPag",f.ValorProximoPagamento);setv("f_agenciaSaque",f.AgenciaSaque);
+  toast("Lançamento carregado para edição.");window.scrollTo(0,document.getElementById("mod-financeiro").offsetTop);
+}
+async function excluirLancamento(id){
+  if(!confirm("Apagar este lançamento? Ele sai das listas e dos totais."))return;
+  const r=await apiPost("excluirFinanceiro",{idLancamento:id,responsavel:usuario});
+  if(r&&r.success){toast("Lançamento apagado.");carregarFinanceiro();carregarFinConsolidado();}else toast((r&&r.error)||"Erro.",true);
 }
 async function carregarFinConsolidado(){
   const r=await apiGet("getFinanceiroConsolidado");const el=document.getElementById("finConsolidado");
@@ -763,13 +794,17 @@ async function carregarDashboard(){
   const r=await apiGet("getDashboard");
   if(!r.success){el.innerHTML="Erro: "+r.error;return;}
   const d=r.data;
-  el.innerHTML=`<div class="kpi"><div class="v">${d.totalClientes}</div><div class="l">Total de clientes</div></div>
-    <div class="kpi"><div class="v">${d.concedidos}</div><div class="l">Concedidos</div></div>
-    <div class="kpi"><div class="v">${d.indeferidos}</div><div class="l">Indeferidos</div></div>
-    <div class="kpi"><div class="v">${d.taxaExito}%</div><div class="l">Taxa de êxito</div></div>
-    <div class="kpi"><div class="v">R$ ${Number(d.totalAReceber||0).toFixed(2).replace('.',',')}</div><div class="l">A receber</div></div>`;
+  const kpi=(v,l,cor)=>`<div class="kpi"><div class="v"${cor?` style="color:${cor}"`:''}>${v}</div><div class="l">${l}</div></div>`;
+  let html=kpi(d.totalClientes,"Total de clientes")+kpi(d.novosMes,"Novos no mês")+kpi(d.concedidos,"Concedidos","#1e7d3a")+kpi(d.indeferidos,"Indeferidos","#b0281f")+kpi(d.taxaExito+"%","Taxa êxito (adm)")+kpi(d.taxaJudicial+"%","Êxito judicial")+kpi(d.judicializados,"Judicializados");
+  html+=`<h3>Financeiro</h3>`+kpi(fmtBRL(d.recebidoMes),"Recebido no mês","#1e7d3a")+kpi(fmtBRL(d.totalAReceber),"A receber","#c98a00")+kpi(fmtBRL(d.custos),"Custos","#b0281f")+kpi(fmtBRL(d.lucroMes),"Resultado do mês")+kpi(d.inadCount+" · "+fmtBRL(d.inadValor),"Inadimplência");
+  html+=`<h3>Benefício por Incapacidade</h3>`+kpi(d.biTotal,"Casos B.I.")+kpi(d.biCessando15,"Cessam ≤15 dias","#c98a00")+kpi(d.biCessados,"Já cessados","#b0281f");
+  html+=`<h3>Prazos & Agenda</h3>`+kpi(d.periciasProximas,"Perícias ≤15 dias")+kpi(d.provPendentes,"Providências pendentes")+kpi(d.provVencidas,"Providências vencidas","#b0281f");
+  html+=`<h3>Por fase</h3>`+Object.keys(d.porGrupo||{}).map(g=>kpi(d.porGrupo[g],g)).join("");
+  html+=`<h3>Por benefício</h3>`+Object.keys(d.porBeneficio||{}).map(b=>kpi(d.porBeneficio[b],b)).join("");
+  el.innerHTML=html;
   }catch(e){el.innerHTML='<span class="mut">Falha ao carregar o painel: '+e+'</span>';}
 }
+
 let dragId=null;
 async function carregarKanban(){
   const el=document.getElementById("kanban");el.innerHTML="carregando...";
