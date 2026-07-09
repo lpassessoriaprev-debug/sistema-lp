@@ -70,6 +70,9 @@ a{color:var(--azul2);}
 .autolist.show{display:block;}
 .autolist div{padding:7px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid #eef2f6;}
 .autolist div:hover{background:#eef6ff;}
+.kgrupo{border:1px solid var(--borda);border-radius:8px;margin-bottom:8px;background:#fff;}
+.kgrupo-head{padding:10px 14px;cursor:pointer;background:var(--cinza);border-radius:8px;font-size:14px;color:var(--azul);}
+.kgrupo-body{padding:8px;}
 </style>
 </head>
 <body>
@@ -133,7 +136,7 @@ a{color:var(--azul2);}
       </div>
       <h3>Dados internos</h3>
       <div class="grid3">
-        <div><label>Senha Meu INSS (Acesso GOV)</label><input id="c_acessoGOV" type="password" placeholder="(sensível)"></div>
+        <div><label>Senha Meu INSS (Acesso GOV)</label><input id="c_acessoGOV" type="text" placeholder="senha do gov.br"></div>
         <div><label>Especialidade médica</label><select id="c_especialidadeMedica"><option value="">--</option><option>Ortopédica</option><option>Psiquiátrica</option><option>Neurológica</option><option>Oncológica</option><option>Visual</option><option>Autoimune</option><option>Outra</option></select></div>
         <div><label>Tempo de laudo</label><select id="c_tempoLaudo"><option value="">--</option><option>Permanente</option><option>10</option><option>30</option><option>60</option><option>90</option><option>120</option><option>180</option></select></div>
         <div><label>Possui laudo?</label><select id="c_possuiLaudo"><option>Não</option><option>Sim</option></select></div>
@@ -477,7 +480,7 @@ async function carregarCliente(id){
   setv("c_temRepresentante",c.temRepresentante);toggleRepresentante();
   setv("c_representanteNome",c.representanteNome);setv("c_representanteCPF",c.representanteCPF);setv("c_representanteRG",c.representanteRG);setv("c_representanteParentesco",c.representanteParentesco);
   setv("c_especialidadeMedica",c.especialidadeMedica);setv("c_tempoLaudo",c.tempoLaudo);setv("c_possuiLaudo",c.possuiLaudo);
-  setv("c_qualidadeSegurado",c.qualidadeSegurado);setv("c_estaTrabalhando",c.estaTrabalhando);setv("c_observacaoDoenca",c.observacaoDoenca);
+  setv("c_qualidadeSegurado",c.qualidadeSegurado);setv("c_estaTrabalhando",c.estaTrabalhando);setv("c_observacaoDoenca",c.observacaoDoenca);setv("c_acessoGOV",c.acessoGOV);
   setv("c_statusProcesso",c.statusProcesso);setv("c_resultadoProcesso",c.resultadoProcesso);
   setv("c_ehJudicializado",c.ehJudicializado);toggleJudicial();
   setv("c_numProcesso",c.numProcesso);setv("c_dataAjuizamento",brParaIso(c.dataAjuizamento));setv("c_varaJuizo",c.varaJuizo);setv("c_situacaoJudicial",c.situacaoJudicial);
@@ -510,11 +513,11 @@ async function abrirFicha(id){
      <div class="q cus"><div class="l">Custos</div><div class="v">${dre.custosFmt||'R$ 0,00'}</div></div>
      <div class="q luc"><div class="l">Lucro Líquido</div><div class="v">${dre.lucroFmt||'R$ 0,00'}</div></div></div>
    <p>${c.linkPasta?`<a href="${c.linkPasta}" target="_blank">📁 Abrir Pasta Drive</a>`:''} ${c.linkPDF?` · <a href="${c.linkPDF}" target="_blank">📄 Abrir Contrato/Procuração</a>`:''}</p>
-   ${c.acessoGOVProtegido?`<button class="btn cinza pequeno" onclick="revelarSenha('${c.idCliente}')">🔒 Revelar senha Meu INSS (com auditoria)</button> <span id="senhaRev"></span>`:''}
+   ${c.acessoGOV?`<div class="alerta aviso">🔑 <b>Senha Meu INSS:</b> ${c.acessoGOV}</div>`:'<span class="mut">Sem senha cadastrada.</span>'}
    <h3>Agendamentos</h3>${tabelaSimples(d.agenda,["DataAgendamento","Hora","Tipo","Status","Resultado"])}
    <h3>Providências</h3>${tabelaSimples(d.providencias,["Providencia","DataLimite","Status"])}
    <h3>Financeiro</h3>${tabelaSimples(d.financeiro,["Natureza","Beneficio","ValorFinal","StatusPagamento","DataEfetivacao"])}
-   <div class="linha-btns"><button class="btn" onclick="carregarCliente('${c.idCliente}');document.getElementById('fichaCliente').classList.add('oculto');">Editar cadastro</button><button class="btn cinza" onclick="fecharFicha()">✕ Fechar ficha</button></div>`;
+   <div class="linha-btns"><button class="btn" onclick="carregarCliente('${c.idCliente}');document.getElementById('fichaCliente').classList.add('oculto');">✏️ Editar cadastro</button><button class="btn verde" onclick="agendarNaFicha()">📅 Agendar</button><button class="btn verde" onclick="lancarNaFicha()">💰 Lançar financeiro</button><button class="btn verde" onclick="abrirFormMovimento()">🩺 Movimentação B.I.</button><button class="btn" onclick="anexarNaFicha()">📎 Anexar documento</button><button class="btn cinza" onclick="gerarRelatorioFicha()">📄 Relatório PDF</button><button class="btn" onclick="importarExtratoINSS()">📥 Extrato INSS</button><button class="btn cinza" onclick="fecharFicha()">✕ Fechar</button></div>`;
   const fc=document.getElementById("fichaCliente");fc.classList.remove("oculto");document.getElementById("fichaConteudo").innerHTML=html;
   window.scrollTo(0,fc.offsetTop-60);
   }catch(e){toast("Erro ao abrir a ficha: "+e,true);}
@@ -652,6 +655,133 @@ async function cancelarMovimento(id){
   if(r&&r.success){toast("Movimentação excluída.");abrirFicha(fichaAtual.id);}else toast((r&&r.error)||"Erro.",true);
 }
 
+function irParaAba(mod){
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("ativo"));
+  const b=document.querySelector('nav button[data-mod="'+mod+'"]');if(b)b.classList.add("ativo");
+  document.querySelectorAll(".modulo").forEach(m=>m.classList.remove("ativo"));
+  const s=document.getElementById("mod-"+mod);if(s)s.classList.add("ativo");
+  window.scrollTo(0,0);
+}
+function agendarNaFicha(){
+  if(!fichaAtual)return;
+  irParaAba("agenda");setv("a_nome",fichaAtual.nome);setv("a_cpf",fichaAtual.cpf);
+  carregarAgenda();carregarProvidencias();toast("Agenda aberta — cliente preenchido.");
+}
+function lancarNaFicha(){
+  if(!fichaAtual)return;
+  irParaAba("financeiro");carregarFinConsolidado();carregarFinanceiro();carregarClientesCache();
+  setv("f_nome",fichaAtual.nome);setv("f_cpf",fichaAtual.cpf);setv("f_idCliente",fichaAtual.id);
+  toast("Financeiro aberto — cliente preenchido.");
+}
+function anexarNaFicha(){
+  if(!fichaAtual)return;
+  abrirModal(`<h3>Anexar documento — ${fichaAtual.nome}</h3>
+    <label>Descrição do documento</label><input id="anx_item" placeholder="ex.: Laudo médico, RG, Comprovante">
+    <label>Arquivo</label><input type="file" id="anx_file">
+    <div class="linha-btns"><button class="btn verde" onclick="enviarAnexo()">Enviar</button><button class="btn cinza" onclick="fecharModal()">Cancelar</button></div>
+    <p class="mut">Salvo na pasta do cliente no Drive. Ideal até ~5 MB.</p>`);
+}
+async function enviarAnexo(){
+  const f=document.getElementById("anx_file");
+  if(!f||!f.files||!f.files.length){toast("Escolha um arquivo.",true);return;}
+  const file=f.files[0];const reader=new FileReader();
+  reader.onload=async()=>{
+    const base64=String(reader.result).split(",")[1];
+    toast("Enviando documento...");
+    const r=await apiPost("anexarDocumento",{idCliente:fichaAtual.id,item:val("anx_item")||file.name,nomeArquivo:file.name,mimeType:file.type,base64:base64,responsavel:usuario});
+    if(r&&r.success){fecharModal();toast("Documento anexado!");abrirFicha(fichaAtual.id);}else toast((r&&r.error)||"Erro ao anexar.",true);
+  };
+  reader.readAsDataURL(file);
+}
+async function gerarRelatorioFicha(){
+  if(!fichaAtual)return;
+  toast("Gerando relatório PDF...");
+  const r=await apiPost("gerarRelatorioCliente",{idCliente:fichaAtual.id,responsavel:usuario});
+  if(r&&r.success&&r.data&&r.data.link){toast("Relatório gerado!");window.open(r.data.link,"_blank");}else toast((r&&r.error)||"Erro ao gerar relatório.",true);
+}
+async function carregarPdfJs(){
+  if(window.pdfjsLib)return window.pdfjsLib;
+  await new Promise((res,rej)=>{const sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";sc.onload=res;sc.onerror=()=>rej("falha ao carregar leitor de PDF");document.body.appendChild(sc);});
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  return window.pdfjsLib;
+}
+async function extrairTextoPdf(buf){
+  const pdfjs=await carregarPdfJs();
+  const pdf=await pdfjs.getDocument({data:buf}).promise;
+  let linhas=[];
+  for(let p=1;p<=pdf.numPages;p++){
+    const page=await pdf.getPage(p);const tc=await page.getTextContent();
+    const byY={};
+    tc.items.forEach(it=>{const y=Math.round(it.transform[5]);(byY[y]=byY[y]||[]).push([it.transform[4],it.str]);});
+    Object.keys(byY).map(Number).sort((a,b)=>b-a).forEach(y=>{linhas.push(byY[y].sort((a,b)=>a[0]-b[0]).map(o=>o[1]).join(" "));});
+  }
+  return linhas.join("\n");
+}
+function parseExtrato(txt){
+  const cpf=(txt.match(/CPF:\s*([\d.\-]+)/)||[])[1]||"";
+  const nome=(txt.match(/Nome:\s*([^\n]+)/)||[])[1]||"";
+  const blocos=txt.split(/Cr[ée]ditos do Benef[íi]cio/).slice(1);
+  const pags=[];
+  blocos.forEach(b=>{
+    const nb=(b.match(/NB:\s*([\d.\-]+)/)||[])[1]||"";
+    const esp=((b.match(/Esp[ée]cie:\s*([^\n]+)/)||[])[1]||"").trim();
+    const dib=(b.match(/\(DIB\):\s*(\d{2}\/\d{2}\/\d{4})/)||[])[1]||"";
+    const dcb=(b.match(/\(DCB\):\s*(\d{2}\/\d{2}\/\d{4})/)||[])[1]||"";
+    const re=/(\d{2}\/\d{4})\s+(\d{2}\/\d{2}\/\d{4})\s+R\$\s*([\d.]+,\d{2})(.*)/g;let m;
+    while((m=re.exec(b))){
+      const comp=m[1],valor=m[3],resto=m[4]||"";
+      const status=/Pago/.test(resto)?"Pago":"Pendente";
+      const datas=resto.match(/\d{2}\/\d{2}\/\d{4}/g)||[];
+      const idx=b.indexOf(m[0]);
+      const bm=b.slice(idx,idx+400).match(/Banco:\s*([^\n]+?)Ocorr/);
+      const agencia=bm?bm[1].replace(/\s+/g," ").trim():"";
+      pags.push({nb,esp,dib,dcb,comp,valor,status,agencia,data:(datas[1]||datas[0]||"")});
+    }
+  });
+  return {nome,cpf,pagamentos:pags};
+}
+function importarExtratoINSS(){
+  if(!fichaAtual)return;
+  abrirModal(`<h3>📥 Importar extrato do INSS — ${fichaAtual.nome}</h3>
+   <label>Arquivo do extrato (Histórico de Créditos, PDF)</label><input type="file" id="ext_file" accept="application/pdf">
+   <label>% de honorário a aplicar em cada crédito</label><input id="ext_perc" value="30" oninput="this.value=this.value.replace(/[^0-9.,]/g,'')">
+   <div class="linha-btns"><button class="btn" onclick="lerExtrato()">Ler extrato</button><button class="btn cinza" onclick="fecharModal()">Cancelar</button></div>
+   <div id="ext_preview" style="margin-top:10px"></div>`);
+}
+let EXT_PAGS=[];
+async function lerExtrato(){
+  const f=document.getElementById("ext_file");
+  if(!f||!f.files||!f.files.length){toast("Escolha o PDF do extrato.",true);return;}
+  document.getElementById("ext_preview").innerHTML="lendo o PDF...";
+  try{
+    const buf=await f.files[0].arrayBuffer();
+    const txt=await extrairTextoPdf(buf);
+    const r=parseExtrato(txt);
+    EXT_PAGS=r.pagamentos;
+    if(!EXT_PAGS.length){document.getElementById("ext_preview").innerHTML='<span class="mut">Não consegui identificar créditos neste PDF. Confira se é o "Histórico de Créditos" ou lance manualmente.</span>';return;}
+    const cpfOk=r.cpf&&fichaAtual.cpf&&r.cpf.replace(/\D/g,"")===fichaAtual.cpf.replace(/\D/g,"");
+    let html=`<div class="alerta ${cpfOk?'aviso':'perigo'}">Filiado: <b>${r.nome}</b> · CPF ${r.cpf} ${cpfOk?'✓ confere com o cliente':'⚠️ CPF diferente do cliente aberto!'}</div>`;
+    html+='<table><tr><th>✓</th><th>NB</th><th>Comp.</th><th>Valor bruto</th><th>Status</th><th>Pgto</th><th>Agência</th></tr>'+
+      EXT_PAGS.map((p,i)=>`<tr><td><input type="checkbox" class="ext_ck" data-i="${i}" checked></td><td>${p.nb}</td><td>${p.comp}</td><td>R$ ${p.valor}</td><td>${p.status}</td><td>${p.data}</td><td>${p.agencia}</td></tr>`).join("")+'</table>';
+    html+=`<p class="mut">Ao importar, cada crédito vira uma <b>Entrada</b> no financeiro: valor bruto = valor do INSS, e o sistema aplica o % de honorário. Confira antes.</p><div class="linha-btns"><button class="btn verde" onclick="confirmarExtrato()">Importar selecionados</button></div>`;
+    document.getElementById("ext_preview").innerHTML=html;
+  }catch(e){document.getElementById("ext_preview").innerHTML='<span class="mut">Erro ao ler o PDF: '+e+'. Você pode lançar manualmente.</span>';}
+}
+async function confirmarExtrato(){
+  const perc=val("ext_perc")||"0";
+  const sel=[...document.querySelectorAll(".ext_ck")].filter(c=>c.checked).map(c=>EXT_PAGS[+c.dataset.i]);
+  if(!sel.length){toast("Marque ao menos um crédito.",true);return;}
+  toast("Importando "+sel.length+" crédito(s)...");
+  let ok=0;
+  for(const p of sel){
+    const d={natureza:"Entrada",idCliente:fichaAtual.id,nome:fichaAtual.nome,cpf:fichaAtual.cpf,
+      beneficio:"Benefício por Incapacidade",tipoEntrada:"Parcela Mensal",valorBruto:p.valor,percentualHonorario:perc,
+      statusPagamento:p.status,dataEfetivacao:p.data,agenciaSaque:p.agencia,
+      observacao:"Extrato INSS — NB "+p.nb+" comp "+p.comp+(p.esp?(" ("+p.esp+")"):""),responsavel:usuario};
+    const r=await apiPost("salvarFinanceiro",d);if(r&&r.success)ok++;
+  }
+  fecharModal();toast(ok+" crédito(s) importado(s)!");abrirFicha(fichaAtual.id);
+}
 /* ================= AGENDA ================= */
 async function salvarAgenda(){
   const d={idAgenda:val("a_idAgenda"),dataAgendamento:isoParaBR(val("a_data")),hora:val("a_hora"),tipo:val("a_tipo"),
@@ -807,29 +937,53 @@ async function carregarDashboard(){
 
 let dragId=null;
 async function carregarKanban(){
-  const el=document.getElementById("kanban");el.innerHTML="carregando...";
+  const el=document.getElementById("kanban");el.innerHTML="carregando...";el.className="";
   try{
   const r=await apiGet("getKanban");
   if(!r.success){el.innerHTML="Erro: "+r.error;return;}
-  el.innerHTML=r.data.colunas.map((col,ci)=>`<div class="kcol" data-ci="${ci}" ondragover="event.preventDefault();this.classList.add('drop')" ondragleave="this.classList.remove('drop')" ondrop="soltarCard(event,${ci})">
-    <h4>${col.titulo} (${col.cards.length})</h4>
-    ${col.cards.map(c=>`<div class="kcard" draggable="true" ondragstart="dragId='${c.idCliente}'" onclick="abrirFicha('${c.idCliente}')">
-        <b>${c.nome}</b><br>${c.cpf}<br><span class="badge amarelo">${c.faseDetalhada}</span></div>`).join("")}
+  window._kanban=r.data.colunas;
+  el.innerHTML=r.data.colunas.map((col,ci)=>`
+    <div class="kgrupo">
+      <div class="kgrupo-head" onclick="toggleGrupo(${ci})"><b>${col.titulo}</b> <span class="badge azul">${col.cards.length}</span><span class="mut" style="float:right">▾ abrir/fechar</span></div>
+      <div class="kgrupo-body oculto" id="kg${ci}"></div>
     </div>`).join("");
-  window._kcolFases=r.data.colunas.map(c=>c.fases);
   }catch(e){el.innerHTML='<span class="mut">Falha ao carregar o kanban: '+e+'</span>';}
 }
-async function soltarCard(ev,ci){
+function toggleGrupo(ci){
+  const body=document.getElementById("kg"+ci);if(!body)return;
+  if(!body.classList.contains("oculto")){body.classList.add("oculto");return;}
+  const col=window._kanban[ci];
+  const porFase={};col.fases.forEach(f=>porFase[f]=[]);
+  col.cards.forEach(c=>{(porFase[c.faseDetalhada]=porFase[c.faseDetalhada]||[]).push(c);});
+  body.innerHTML='<div class="kanban">'+col.fases.map(f=>`<div class="kcol" data-fase="${f}" ondragover="event.preventDefault();this.classList.add('drop')" ondragleave="this.classList.remove('drop')" ondrop="soltarCardFase(event,this)">
+     <h4>${f} (${(porFase[f]||[]).length})</h4>
+     ${(porFase[f]||[]).map(c=>cardKanban(c)).join("")}
+   </div>`).join("")+'</div>';
+  body.classList.remove("oculto");
+}
+function cardKanban(c){
+  return `<div class="kcard" draggable="true" ondragstart="dragId='${c.idCliente}'">
+    <b onclick="abrirFicha('${c.idCliente}')" style="cursor:pointer">${c.nome}</b><br>${c.cpf}
+    ${c.observacaoAndamento?`<div class="mut" style="margin-top:3px">📝 ${c.observacaoAndamento}</div>`:''}
+    <div style="margin-top:4px"><button class="btn cinza pequeno" onclick="editarAndamento('${c.idCliente}')">Andamento</button></div>
+  </div>`;
+}
+async function soltarCardFase(ev,el){
   ev.preventDefault();document.querySelectorAll(".kcol").forEach(k=>k.classList.remove("drop"));
   if(!dragId)return;
-  const fases=window._kcolFases[ci];
-  const novaFase=prompt("Mover para qual fase desta coluna?\n\n"+fases.map((f,i)=>(i+1)+") "+f).join("\n"),"1");
-  const idx=parseInt(novaFase,10)-1;
-  if(isNaN(idx)||!fases[idx])return;
-  const r=await apiPost("moverCard",{idCliente:dragId,novaFase:fases[idx],responsavel:usuario});
-  if(r.success){toast("Card movido para: "+fases[idx]);carregarKanban();carregarDashboard();}else toast(r.error,true);
+  const fase=el.dataset.fase;
+  const r=await apiPost("moverCard",{idCliente:dragId,novaFase:fase,responsavel:usuario});
+  if(r&&r.success){toast("Movido para: "+fase);carregarKanban();carregarDashboard();}else toast((r&&r.error)||"Erro.",true);
   dragId=null;
 }
+async function editarAndamento(id){
+  const c=(window._kanban||[]).reduce((a,g)=>a.concat(g.cards),[]).find(x=>x.idCliente===id)||{};
+  const txt=prompt("Andamento / observação deste card:",c.observacaoAndamento||"");
+  if(txt===null)return;
+  const r=await apiPost("salvarAndamento",{idCliente:id,texto:txt,responsavel:usuario});
+  if(r&&r.success){toast("Andamento salvo.");carregarKanban();}else toast((r&&r.error)||"Erro.",true);
+}
+
 </script>
 </body>
 </html>
